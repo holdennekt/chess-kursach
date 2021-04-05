@@ -1,7 +1,7 @@
-const block = $('#container')[0];
+const block = document.querySelector('#container');
 
 const grid = createGrid();
 
-$('#container').on('click', clickedOnCell);
+block.addEventListener('click', clickedOnCell);
 
 fillDivs(block);

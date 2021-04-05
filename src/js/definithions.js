@@ -50,8 +50,10 @@ const fillDivs = (block) => {                        //defining divs in containe
 const clickedOnCell = click => {
     let i = parseInt(click.target.id[5]), j = parseInt(click.target.id[6]);
     console.log(i, j, grid[i][j]);
-    $('.selected').removeClass('selected');
-    $('.suggested').removeClass('suggested');
+    const selected = document.querySelector('.selected');
+    const suggested = document.querySelectorAll('.suggested');
+    if (selected) selected.classList.remove('selected');
+    for (const elem of suggested) elem.classList.remove('suggested');
     if (grid[i][j] !== fig.empty) {
         click.target.className += ' selected';
         const moves = suggestMoves(i, j);

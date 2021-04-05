@@ -13,8 +13,8 @@ const suggestMoves = (i, j) => {
     }
     for (const i of availableCells) {
         const id = `#cell_${i[0]}${i[1]}`;
-        $(id)[0].className += ' suggested';
-        console.log(id, $(id));
+        const elem = document.querySelector(id);
+        elem.className += ' suggested';
     }
     return availableCells;
 }
