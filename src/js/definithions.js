@@ -4,6 +4,12 @@ const fig = {
     bP: 7,    bN: 8,    bB: 9,    bR: 10,    bQ: 11,    bK: 12,
 };
 
+const colors = {
+    white: 0,
+    black: 1,
+    both: 2,
+};
+
 const createGrid = () => {                           //grid of board
     let grid = [[], [], [], [], [], [], [], []];
     grid[0] = [fig.bR, fig.bN, fig.bB, fig.bQ, fig.bK, fig.bB, fig.bN, fig.bR];
@@ -59,3 +65,5 @@ const clickedOnCell = click => {
         const moves = suggestMoves(i, j);
     }
 }
+
+
