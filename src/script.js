@@ -4,4 +4,4 @@ const grid = createGrid();
 
 block.addEventListener('click', clickedOnCell);
 
-fillDivs(block);
+fillDivs(block); //init figures
