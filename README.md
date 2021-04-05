@@ -1,2 +1,4 @@
 # chess_kursach
-Participants: Nikita Gryshchak, Pinchuk Bohdan
+Participants: 
+    Nikita Gryshchak
+    Pinchuk Bohdan
