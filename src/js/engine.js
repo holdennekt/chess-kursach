@@ -82,7 +82,7 @@ const isSqAttackedBySide = (i, j, side) => {
                 tempI += dir[0], tempJ += dir[1];
             }
         }
-        for (const dir of KnDir) {
+        for (const dir of KiDir) {
             if (grid[i + dir[0]][j + dir[1]] === fig.bK) {
                 console.log(`attacked by ${grid[i + dir[0]][j + dir[1]]}`);
                 return true;
