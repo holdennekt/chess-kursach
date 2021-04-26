@@ -17,6 +17,8 @@ const BiDir = [[-1, 1], [-1, -1], [1, -1], [1, 1]];
 const RkDir = [[0, 1], [-1, 0], [0, -1], [1, 0]];
 const KiDir = [[0, 1], [-1, 1], [-1, 0], [-1, -1], [0, -1], [1, -1], [1, 0], [1, 1]];
 
+const figValue = [0, 100, 325, 325, 550, 1000, 50000, 100, 325, 325, 550, 1000, 50000];
+
 const grid = {};
 for (let i = -2; i < 10; i++) {
     grid[i] = {};
@@ -149,4 +151,21 @@ const clickedOnSquare = click => {
     // const moves = suggestMoves(i, j);
     const attacked = isSqAttackedBySide(i, j, colors.white);
     console.log(attacked);
+    updateListsMaterial();
 };
+
+const updateListsMaterial = () => {
+    gameBoard.score.white = 0, gameBoard.score.black = 0;
+    for (let i = 0; i < 8; i++) {
+        for (let j = 0; j < 8; j++) { 
+            if (grid[i][j] > 0 && grid[i][j] < 7) {
+                gameBoard.score.white += figValue[grid[i][j]];
+            }
+
+            if (grid[i][j] > 6 && grid[i][j] < 13) {
+                gameBoard.score.black += figValue[grid[i][j]];
+            }
+        }
+    }
+    console.log(`white score = ${gameBoard.score.white} black score = ${gameBoard.score.black}`);
+}
