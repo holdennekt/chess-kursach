@@ -161,7 +161,6 @@ const updateListsMaterial = () => {
             if (grid[i][j] > 0 && grid[i][j] < 7) {
                 gameBoard.score.white += figValue[grid[i][j]];
             }
-
             if (grid[i][j] > 6 && grid[i][j] < 13) {
                 gameBoard.score.black += figValue[grid[i][j]];
             }
