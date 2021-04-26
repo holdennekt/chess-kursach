@@ -168,3 +168,5 @@ const updateListsMaterial = () => {
     }
     console.log(`white score = ${gameBoard.score.white} black score = ${gameBoard.score.black}`);
 }
+
+const figIndex = (fig, figNum) => (fig * 10 + figNum);
