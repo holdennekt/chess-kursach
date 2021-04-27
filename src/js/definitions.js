@@ -17,6 +17,10 @@ const BiDir = [[-1, 1], [-1, -1], [1, -1], [1, 1]];
 const RkDir = [[0, 1], [-1, 0], [0, -1], [1, 0]];
 const KiDir = [[0, 1], [-1, 1], [-1, 0], [-1, -1], [0, -1], [1, -1], [1, 0], [1, 1]];
 
+const figDir = [0, 0, KnDir, BiDir, RkDir, KiDir, KiDir, 0, KnDir, BiDir, RkDir, KiDir, KiDir];
+const noSlideFigs = [fig.wN, fig.wK, fig.bN, fig.bK];
+const slideFigs = [fig.wB, fig.wR, fig.wQ, fig.bB, fig.bR, fig.bQ];
+
 const figValue = [0, 100, 325, 325, 550, 1000, 50000, 100, 325, 325, 550, 1000, 50000];
 
 const figCol = [
