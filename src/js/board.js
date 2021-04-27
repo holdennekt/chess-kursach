@@ -10,6 +10,7 @@ const gameBoard = {
         blackQSide: true,
     },
     'enPas': [-1, -1],
+    'history' : [],
 };
 gameBoard.score = {
     'white' : 0,
@@ -20,6 +21,11 @@ gameBoard.figNum = arr(13);
 gameBoard.moveList = [];
 gameBoard.moveListStart = [];
 gameBoard.moveScores = [];
+
+const checkBoard = () => {
+    let t_figNum = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    let t_score = [0, 0];
+}
 
 const updateListsMaterial = () => {
     gameBoard.score.white = 0, gameBoard.score.black = 0;
