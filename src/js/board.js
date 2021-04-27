@@ -3,8 +3,13 @@ const gameBoard = {
 	'fiftyMove': 0,
 	'hisPly': 0,
 	'ply': 0,
-	'castlePerm': 0,
-    'enPas' : 0,
+	'castlePerm': {
+        whiteKSide: true,
+        whiteQSide: true,
+        blackKSide: true,
+        blackQSide: true,
+    },
+    'enPas': [-1, -1],
 };
 gameBoard.score = {
     'white' : 0,
@@ -14,6 +19,7 @@ gameBoard.figList = arr(10 * 13);
 gameBoard.figNum = arr(13);
 gameBoard.moveList = [];
 gameBoard.moveListStart = [];
+gameBoard.moveScores = [];
 
 const updateListsMaterial = () => {
     gameBoard.score.white = 0, gameBoard.score.black = 0;
