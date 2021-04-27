@@ -91,21 +91,3 @@ const isSqAttackedBySide = (i, j, side) => {
     }
     return false;
 };
-
-const suggestMoves = (i, j) => {
-    const figure = grid[i][j];
-    const availableSquares = [];
-    if (figure < 7) {
-        if (figure === fig.wP) {
-            if (grid[i - 1][j] === 0) availableSquares.push([i - 1, j]);
-            if (grid[i - 1][j] === 0 && i === 6) availableSquares.push([i - 2, j]);
-            if (grid[i - 1][j - 1] > 6) availableSquares.push([i - 1, j - 1]);
-            if (grid[i - 1][j + 1] > 6) availableSquares.push([i - 1, j + 1]);
-        }
-    }
-    for (const i of availableSquares) {
-        const elem = document.querySelector(`#sq_${i[0]}${i[1]}`);
-        elem.className += ' suggested';
-    }
-    return availableSquares;
-};

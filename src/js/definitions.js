@@ -19,6 +19,11 @@ const KiDir = [[0, 1], [-1, 1], [-1, 0], [-1, -1], [0, -1], [1, -1], [1, 0], [1,
 
 const figValue = [0, 100, 325, 325, 550, 1000, 50000, 100, 325, 325, 550, 1000, 50000];
 
+const figCol = [
+    0, 'white', 'white', 'white', 'white', 'white', 'white',
+    'black', 'black', 'black', 'black', 'black', 'black'
+];
+
 const grid = {};
 for (let i = -2; i < 10; i++) {
     grid[i] = {};
@@ -154,19 +159,10 @@ const clickedOnSquare = click => {
     updateListsMaterial();
 };
 
-const updateListsMaterial = () => {
-    gameBoard.score.white = 0, gameBoard.score.black = 0;
-    for (let i = 0; i < 8; i++) {
-        for (let j = 0; j < 8; j++) { 
-            if (grid[i][j] > 0 && grid[i][j] < 7) {
-                gameBoard.score.white += figValue[grid[i][j]];
-            }
-            if (grid[i][j] > 6 && grid[i][j] < 13) {
-                gameBoard.score.black += figValue[grid[i][j]];
-            }
-        }
-    }
-    console.log(`white score = ${gameBoard.score.white} black score = ${gameBoard.score.black}`);
-}
-
 const figIndex = (fig, figNum) => (fig * 10 + figNum);
+
+const arr = n => {
+    const res = [];
+    for (let i = 0; i < n; i++) res.push(0);
+    return res;
+};

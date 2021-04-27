@@ -10,7 +10,24 @@ gameBoard.score = {
     'white' : 0,
     'black' : 0,
 };
-gameBoard.figList = [];
-gameBoard.figNum = [];
+gameBoard.figList = arr(10 * 13);
+gameBoard.figNum = arr(13);
 gameBoard.moveList = [];
-gameBoard.moveListFirst = [];
+gameBoard.moveListStart = [];
+
+const updateListsMaterial = () => {
+    gameBoard.score.white = 0, gameBoard.score.black = 0;
+    for (let i = 0; i < 8; i++) {
+        for (let j = 0; j < 8; j++) {
+            let fig = grid[i][j];
+            if (fig !== fig.empty) {
+                let sq = [i, j];
+                let color = figCol[fig];
+                gameBoard.score[color] += figValue[fig];
+                gameBoard.figList[figIndex(fig, gameBoard.figNum[fig])] = sq;
+                gameBoard.figNum[fig]++;
+            }
+        }
+    }
+    console.log(`white score = ${gameBoard.score.white} black score = ${gameBoard.score.black}`);
+}
