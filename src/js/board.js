@@ -13,13 +13,13 @@ const gameBoard = {
     'history' : [],
 };
 gameBoard.score = {
-    'white' : 0,
-    'black' : 0,
+    '0' : 0,
+    '1' : 0,
 };
-gameBoard.figList = arr(10 * 13);
-gameBoard.figNum = arr(13);
-gameBoard.moveList = [];
-gameBoard.moveListStart = [];
+gameBoard.figList = arr0(10 * 13);
+gameBoard.figNum = arr0(13);
+gameBoard.moveList = arr0(700);
+gameBoard.moveListStart = arr0(7);
 gameBoard.moveScores = [];
 
 const checkBoard = () => {
@@ -31,13 +31,14 @@ const updateListsMaterial = () => {
     gameBoard.score.white = 0, gameBoard.score.black = 0;
     for (let i = 0; i < 8; i++) {
         for (let j = 0; j < 8; j++) {
-            let fig = grid[i][j];
-            if (fig !== fig.empty) {
+            let figg = grid[i][j];
+            if (figg !== fig.empty) {
                 let sq = [i, j];
-                let color = figCol[fig];
-                gameBoard.score[color] += figValue[fig];
-                gameBoard.figList[figIndex(fig, gameBoard.figNum[fig])] = sq;
-                gameBoard.figNum[fig]++;
+                let color = figCol[figg];
+                console.log(color);
+                gameBoard.score[color] += figValue[figg];
+                gameBoard.figList[figIndex(figg, gameBoard.figNum[figg])] = sq;
+                gameBoard.figNum[figg]++;
             }
         }
     }

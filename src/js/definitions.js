@@ -7,9 +7,9 @@ const fig = {
 };
 
 const colors = {
-    white: 0,
-    black: 1,
-    both: 2,
+    'white': 0,
+    'black': 1,
+    'both': 2,
 };
 
 const KnDir = [[-1, 2], [-2, 1], [-2, -1], [-1, -2], [1, -2], [2, -1], [2, 1], [1, 2]];
@@ -24,8 +24,8 @@ const slideFigs = [fig.wB, fig.wR, fig.wQ, fig.bB, fig.bR, fig.bQ];
 const figValue = [0, 100, 325, 325, 550, 1000, 50000, 100, 325, 325, 550, 1000, 50000];
 
 const figCol = [
-    0, 'white', 'white', 'white', 'white', 'white', 'white',
-    'black', 'black', 'black', 'black', 'black', 'black'
+    0, 0, 0, 0, 0, 0, 0,
+    1, 1, 1, 1, 1, 1
 ];
 
 const grid = {};
@@ -98,7 +98,7 @@ const logGrid = () => {
             );
         }
     }
-}
+};
 
 logGrid();
 
@@ -161,12 +161,21 @@ const clickedOnSquare = click => {
     const attacked = isSqAttackedBySide(i, j, colors.white);
     console.log(attacked);
     updateListsMaterial();
+    generateMoves();
+    printer();
 };
 
+const printer = () => {
+    for (const move of gameBoard.moveList) {
+        if (move.from === undefined) break;
+        console.log(move.from, move.to, move.captured);
+    }
+};
 const figIndex = (fig, figNum) => (fig * 10 + figNum);
 
-const arr = n => {
+const arr0 = n => {
     const res = [];
     for (let i = 0; i < n; i++) res.push(0);
     return res;
 };
+const arr = n => new Array(n);
