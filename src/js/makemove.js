@@ -1,4 +1,4 @@
-const clearFig = (sq) => {
+const clearFig = sq => {
 	let fig = grid[sq[0]][sq[1]];
 	let col = figCol[fig];
 	let t_figNum = -1;
@@ -40,7 +40,33 @@ const moveFig = (from, to) => {
 	}
 }
 
-const makeMove = (move) => {
+const makeMove = move => {
+	let side = gameBoard.side;
+	if (move.flag.enPas) {
+		if (side == colors.white) {
+			clearFig(move.to[0] + 1, move.to[1]);
+		}
+		else {
+			clearFig(move.to[0] - 1, move.to[1]);
+		}
+	}
+	else if (move.flag.castling === 'whiteKSide') {
+		moveFig([7, 4], [7, 6]); 
+		moveFig([7, 7], [7, 5]);                                                                     
+	}
+	else if (move.flag.castling === 'whiteQSide') {
+		moveFig([7, 4], [7, 2]); 
+		moveFig([7, 0], [7, 3]);                                                                     
+	}
+	else if (move.flag.castling === 'blackKSide') {
+		moveFig([0, 4], [0, 6]); 
+		moveFig([0, 7], [0, 5]);                                                                     
+	}
+	else if (move.flag.castling === 'blackQSide') {
+		moveFig([0, 4], [0, 2]); 
+		moveFig([0, 0], [0, 3]);                                                                     
+	}
 
 }
 // add some to defs and board for makeMover
+//obj move.to/from
