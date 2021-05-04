@@ -5,6 +5,11 @@ const fig = {
     wP: 1,    wN: 2,    wB: 3,    wR: 4,    wQ: 5,    wK: 6,
     bP: 7,    bN: 8,    bB: 9,    bR: 10,    bQ: 11,    bK: 12,
 };
+const revFig = [
+    'none',
+    'wP', 'wN', 'wB', 'wR', 'wQ', 'wK',
+    'bP', 'bN', 'bB', 'bR', 'bQ', 'bK'
+];
 
 const colors = {
     'white': 0,
@@ -12,16 +17,28 @@ const colors = {
     'both': 2,
 };
 
-const KnDir = [[-1, 2], [-2, 1], [-2, -1], [-1, -2], [1, -2], [2, -1], [2, 1], [1, 2]];
+const KnDir = [
+    [-1, 2], [-2, 1], [-2, -1], [-1, -2],
+    [1, -2], [2, -1], [2, 1], [1, 2]
+];
 const BiDir = [[-1, 1], [-1, -1], [1, -1], [1, 1]];
 const RkDir = [[0, 1], [-1, 0], [0, -1], [1, 0]];
-const KiDir = [[0, 1], [-1, 1], [-1, 0], [-1, -1], [0, -1], [1, -1], [1, 0], [1, 1]];
+const KiDir = [
+    [0, 1], [-1, 1], [-1, 0], [-1, -1],
+    [0, -1], [1, -1], [1, 0], [1, 1]
+];
 
-const figDir = [0, 0, KnDir, BiDir, RkDir, KiDir, KiDir, 0, KnDir, BiDir, RkDir, KiDir, KiDir];
+const figDir = [
+    0, 0, KnDir, BiDir, RkDir, KiDir, KiDir,
+    0, KnDir, BiDir, RkDir, KiDir, KiDir
+];
 const noSlideFigs = [fig.wN, fig.wK, fig.bN, fig.bK];
 const slideFigs = [fig.wB, fig.wR, fig.wQ, fig.bB, fig.bR, fig.bQ];
 
-const figValue = [0, 100, 325, 325, 550, 1000, 50000, 100, 325, 325, 550, 1000, 50000];
+const figValue = [
+    0, 100, 325, 325, 550, 1000, 50000,
+    100, 325, 325, 550, 1000, 50000
+];
 
 const figCol = [
     0, 0, 0, 0, 0, 0, 0,
@@ -100,7 +117,7 @@ const logGrid = () => {
     }
 };
 
-logGrid();
+//logGrid();
 
 const createSquares = block => {                //defining divs in container
     let light = 0;
@@ -153,25 +170,18 @@ const highlightSquares = (i, j) => {
     }
 };
 
-const clickedOnSquare = click => {
-    const i = parseInt(click.target.id[3]), j = parseInt(click.target.id[4]);
-    console.log(`clicked on (${i}, ${j}) figure is ${grid[i][j]}`);
-    highlightSquares(i, j);
-    // const moves = suggestMoves(i, j);
-    const attacked = isSqAttackedBySide(i, j, colors.white);
-    console.log(attacked);
-    updateListsMaterial();
-    generateMoves();
-    printer();
-};
-
 const printer = () => {
     for (const move of gameBoard.moveList) {
+        const from = move.from, to = move.to;
         if (move.from === undefined) break;
-        console.log(move.from, move.to, move.captured);
+        console.log(
+            revFig[grid[from[0]][from[1]]], from[0], from[1],
+            '| to', to[0], to[1],
+            '| captured', revFig[move.captured],
+            '| promoted to', revFig[move.promoted]
+        );
     }
 };
-const figIndex = (fig, figNum) => (fig * 10 + figNum);
 
 const arr0 = n => {
     const res = [];
@@ -179,6 +189,22 @@ const arr0 = n => {
     return res;
 };
 const arr = n => new Array(n);
+
+const clickedOnSquare = click => {
+    const i = parseInt(click.target.id[3]), j = parseInt(click.target.id[4]);
+    console.log(`clicked on (${i}, ${j}) figure is ${grid[i][j]}`);
+    highlightSquares(i, j);
+    console.log(
+        'by white', isSqAttackedBySide(i, j, colors.white),
+        'by black', isSqAttackedBySide(i, j, colors.black)
+    );
+    gameBoard.moveListStart = arr0(7);
+    updateListsMaterial();
+    generateMoves();
+    printer();
+};
+
+const figIndex = (fig, figNum) => (fig * 10 + figNum);
 
 // const arrEql = (arr1, arr2) => {
 //     if (arr1.length !== arr2.length) {
