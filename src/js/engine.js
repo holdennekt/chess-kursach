@@ -1,7 +1,8 @@
 'use strict';
 
-const knBiRkKi = (i, j, side) => {
+const knBiRkKi = (sq, side) => {
     let knight, bishop, rook, queen, king;
+    const i = sq[0], j = sq[1];
     if (side === colors.white) {
         knight = fig.wN;
         bishop = fig.wB;
@@ -57,7 +58,8 @@ const knBiRkKi = (i, j, side) => {
     }
     return false;
 };
-const isSqAttackedBySide = (i, j, side) => {
+const isSqAttackedBySide = (sq, side) => {
+    const i = sq[0], j = sq[1];
     if (side === colors.white) {
         if (grid[i + 1][j - 1] === fig.wP || grid[i + 1][j + 1] === fig.wP) {
             console.log('attacked by wP');
@@ -67,5 +69,5 @@ const isSqAttackedBySide = (i, j, side) => {
         console.log('attacked by bP');
         return true;
     }
-    return knBiRkKi(i, j, side);
+    return knBiRkKi([i, j], side);
 };
