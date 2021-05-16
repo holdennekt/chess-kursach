@@ -45,6 +45,26 @@ const figCol = [
     1, 1, 1, 1, 1, 1
 ];
 
+const maxDepth = 64;
+const maxGameMoves = 2048;
+const maxPositionMoves = 256;
+const inf = 30000;
+const mate = 29000;
+const pvEntries = 10000;
+
+const mirrorTable = [
+    [[7, 0], [7, 1], [7, 2], [7, 3], [7, 4], [7, 5], [7, 6], [7, 7]],
+    [[6, 0], [6, 1], [6, 2], [6, 3], [6, 4], [6, 5], [6, 6], [6, 7]],
+    [[5, 0], [5, 1], [5, 2], [5, 3], [5, 4], [5, 5], [5, 6], [5, 7]],
+    [[4, 0], [4, 1], [4, 2], [4, 3], [4, 4], [4, 5], [4, 6], [4, 7]],
+    [[3, 0], [3, 1], [3, 2], [3, 3], [3, 4], [3, 5], [3, 6], [3, 7]],
+    [[2, 0], [2, 1], [2, 2], [2, 3], [2, 4], [2, 5], [2, 6], [2, 7]],
+    [[1, 0], [1, 1], [1, 2], [1, 3], [1, 4], [1, 5], [1, 6], [1, 7]],
+    [[0, 0], [0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [0, 7]]
+];
+
+const kings = [fig.wK, fig.bK];
+
 const grid = {};
 for (let i = -2; i < 10; i++) {
     grid[i] = {};
@@ -188,33 +208,30 @@ const arr0 = n => {
     for (let i = 0; i < n; i++) res.push(0);
     return res;
 };
+const arrOfObj = n => {
+    const res = [];
+    for (let i = 0; i < n; i++) {
+        res.push({move: {from: 0, to: 0}, posKey: 0});
+    }
+    return res;
+}
 const arr = n => new Array(n);
+
+const emptMove = () => ({from: 0, to: 0});
 
 const clickedOnSquare = click => {
     const i = parseInt(click.target.id[3]), j = parseInt(click.target.id[4]);
     console.log(`clicked on (${i}, ${j}) figure is ${grid[i][j]}`);
     highlightSquares(i, j);
     console.log(
-        'by white', isSqAttackedBySide(i, j, colors.white),
-        'by black', isSqAttackedBySide(i, j, colors.black)
+        'by white', isSqAttackedBySide([i, j], colors.white),
+        'by black', isSqAttackedBySide([i, j], colors.black)
     );
     gameBoard.moveListStart = arr0(7);
     updateListsMaterial();
     generateMoves();
-    printer();
+    //printer();
+    searchPosition();
 };
 
 const figIndex = (fig, figNum) => (fig * 10 + figNum);
-
-// const arrEql = (arr1, arr2) => {
-//     if (arr1.length !== arr2.length) {
-//         return false;
-//     }
-//     for (const i in arr1) {
-//         if (arr1[i] !== arr2[i]) {
-//             return false;
-//         }
-//     }
-//     return true;
-// }
-
