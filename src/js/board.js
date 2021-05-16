@@ -10,7 +10,7 @@ const gameBoard = {
         blackQSide: true,
     },
     'enPas': [-1, -1],
-    'history': [],
+    'history': arr(maxGameMoves),
 };
 gameBoard.score = [0, 0];
 gameBoard.figList = arr0(130);
@@ -18,6 +18,11 @@ gameBoard.figNum = arr0(13);
 gameBoard.moveList = arr0(700);
 gameBoard.moveListStart = arr0(7);
 gameBoard.moveScores = [];
+gameBoard.pvTable = arrOfObj(pvEntries);
+gameBoard.pvArr = arr0(maxDepth);
+gameBoard.searchHistory = arr0(14 * 64);
+gameBoard.searchKillers = arr0(3 * maxDepth);
+gameBoard.posKey = 0;
 
 const checkBoard = () => {
     const tFigNum = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
