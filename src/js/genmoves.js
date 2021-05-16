@@ -1,7 +1,20 @@
+const moveExists = (move) => {
+    generateMoves();
+    const start = gameBoard.moveListStart[gameBoard.ply];
+    const end = gameBoard.moveListStart[gameBoard.ply + 1];
+    for (let index = start; index < end; index++) {
+        let moveFound = gameBoard.moveList[index];
+        if (!makeMove(moveFound)) continue;
+        takeMove();
+        if (move === moveFound) return true;
+    }
+    return false;
+};
+
 const flag = (enPas, pawnStart = false, castling = '') =>
     ({ enPas, pawnStart, castling });
-
-const addMove = (from, to, captured = 0, promoted = 0, flag = null) => {
+const defoltFlag = () => ({ enPas: 0, pawnStart: false, castling: ''});
+const addMove = (from, to, captured = 0, promoted = 0, flag = defoltFlag()) => {
     const move = { from, to, captured, promoted, flag };
     gameBoard.moveList[gameBoard.moveListStart[gameBoard.ply + 1]] = move;
     gameBoard.moveScores[gameBoard.moveListStart[gameBoard.ply + 1]++] = 0;
