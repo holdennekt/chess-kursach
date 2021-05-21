@@ -1,5 +1,5 @@
 const gameBoard = {
-    'side': colors.white,
+    'side': colors['white'],
     'fiftyMove': 0,
     'hisPly': 0,
     'ply': 0,
@@ -36,7 +36,7 @@ const updateListsMaterial = () => {
     for (let i = 0; i < 8; i++) {
         for (let j = 0; j < 8; j++) {
             const figg = grid[i][j];
-            if (figg !== fig.empty) {
+            if (figg !== figs.empty) {
                 const sq = [i, j];
                 const color = figCol[figg];
                 gameBoard.score[color] += figValue[figg];
@@ -49,3 +49,31 @@ const updateListsMaterial = () => {
         'white score =', gameBoard.score[0], 'black score =', gameBoard.score[1]
     );
 };
+
+const genPosKey = () => {
+	let finalKey = 0;
+	let fig = figs.empty;
+
+	for (let i = 0; i < 8; i++){
+		for (let j = 0; j < 8; j++){
+			fig = grid[i][j];
+			if (fig != figs.empty && fig != figs.offBoard) {
+				finalKey ^= figKeys[(fig * 120) + ( 8 * i + j)];
+			}
+		}
+	}
+
+	if (gameBoard.side == colors.white) {
+		finalKey ^= sideKey;
+	}
+
+	if (gameBoard.enPas != figs.offBoard) {
+		finalKey ^= figKeys[gameBoard.enPas];
+	}
+
+	finalKey ^= castleKeys[gameBoard.castlePerm];
+
+	return finalKey;
+
+}
+
