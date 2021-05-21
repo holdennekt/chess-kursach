@@ -6,6 +6,19 @@ block.addEventListener('click', clickedOnSquare);
 
 createBoard(block);
 
+window.onload = onLoad;
+
+
+function onLoad() {
+    init();
+    updateListsMaterial();
+    generateMoves();
+    makeMove(gameBoard.moveList[0]);
+    console.log(grid);
+
+
+}
+
 const initBoardVars = () => {
     for (const elem of gameBoard.history) {
         elem = {
@@ -38,4 +51,4 @@ const init = () => {
     initHashKeys();
 }
 
-init();
+
