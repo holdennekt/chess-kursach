@@ -217,6 +217,14 @@ const arrOfObj = n => {
 }
 const arr = n => new Array(n);
 
+const arrOfEmptyObjects = n => {
+    const res = [];
+    for (let i = 0; i < n; i++) {
+        res.push({});
+    }
+    return res;
+}
+
 const emptMove = () => ({from: 0, to: 0});
 
 const clickedOnSquare = click => {
