@@ -1,5 +1,5 @@
 const gameBoard = {
-    'side': colors['white'],
+    'side': colors.black,
     'fiftyMove': 0,
     'hisPly': 0,
     'ply': 0,
@@ -10,7 +10,7 @@ const gameBoard = {
         blackQSide: true,
     },
     'enPas': [-1, -1],
-    'history': arr(maxGameMoves),
+    'history': arrOfEmptyObjects(maxGameMoves),
 };
 gameBoard.score = [0, 0];
 gameBoard.figList = arr0(130);
@@ -57,17 +57,17 @@ const genPosKey = () => {
 	for (let i = 0; i < 8; i++){
 		for (let j = 0; j < 8; j++){
 			fig = grid[i][j];
-			if (fig != figs.empty && fig != figs.offBoard) {
+			if (fig !== figs.empty && fig !== figs.offBoard) {
 				finalKey ^= figKeys[(fig * 120) + ( 8 * i + j)];
 			}
 		}
 	}
 
-	if (gameBoard.side == colors.white) {
+	if (gameBoard.side === colors.white) {
 		finalKey ^= sideKey;
 	}
 
-	if (gameBoard.enPas != figs.offBoard) {
+	if (gameBoard.enPas[0] !== -1 && gameBoard.enPas[1] !== -1) {
 		finalKey ^= figKeys[gameBoard.enPas];
 	}
 
