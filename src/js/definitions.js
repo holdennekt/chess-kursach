@@ -1,6 +1,6 @@
 'use strict';
 
-const fig = {
+const figs = {
     offBoard: -1, empty: 0,
     wP: 1,    wN: 2,    wB: 3,    wR: 4,    wQ: 5,    wK: 6,
     bP: 7,    bN: 8,    bB: 9,    bR: 10,    bQ: 11,    bK: 12,
@@ -32,8 +32,8 @@ const figDir = [
     0, 0, KnDir, BiDir, RkDir, KiDir, KiDir,
     0, KnDir, BiDir, RkDir, KiDir, KiDir
 ];
-const noSlideFigs = [fig.wN, fig.wK, fig.bN, fig.bK];
-const slideFigs = [fig.wB, fig.wR, fig.wQ, fig.bB, fig.bR, fig.bQ];
+const noSlideFigs = [figs.wN, figs.wK, figs.bN, figs.bK];
+const slideFigs = [figs.wB, figs.wR, figs.wQ, figs.bB, figs.bR, figs.bQ];
 
 const figValue = [
     0, 100, 325, 325, 550, 1000, 50000,
@@ -63,7 +63,7 @@ const mirrorTable = [
     [[0, 0], [0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [0, 7]]
 ];
 
-const kings = [fig.wK, fig.bK];
+const kings = [figs.wK, figs.bK];
 
 const grid = {};
 for (let i = -2; i < 10; i++) {
@@ -73,46 +73,46 @@ for (let i = -2; i < 10; i++) {
     }
 }
 for (let i = -2; i < 10; i++) {
-    grid[-2][i] = fig.offBoard;
-    grid[-1][i] = fig.offBoard;
-    grid[8][i] = fig.offBoard;
-    grid[9][i] = fig.offBoard;
-    grid[i][-2] = fig.offBoard;
-    grid[i][-1] = fig.offBoard;
-    grid[i][8] = fig.offBoard;
-    grid[i][9] = fig.offBoard;
+    grid[-2][i] = figs.offBoard;
+    grid[-1][i] = figs.offBoard;
+    grid[8][i] = figs.offBoard;
+    grid[9][i] = figs.offBoard;
+    grid[i][-2] = figs.offBoard;
+    grid[i][-1] = figs.offBoard;
+    grid[i][8] = figs.offBoard;
+    grid[i][9] = figs.offBoard;
 }
 for (let i = 0; i < 8; i++) {
-    grid[1][i] = fig.bP;
-    grid[6][i] = fig.wP;
+    grid[1][i] = figs.bP;
+    grid[6][i] = figs.wP;
 }
 grid[0] = {
-    '-2': fig.offBoard,
-    '-1': fig.offBoard,
-    0: fig.bR,
-    1: fig.bN,
-    2: fig.bB,
-    3: fig.bQ,
-    4: fig.bK,
-    5: fig.bB,
-    6: fig.bN,
-    7: fig.bR,
-    8: fig.offBoard,
-    9: fig.offBoard,
+    '-2': figs.offBoard,
+    '-1': figs.offBoard,
+    0: figs.bR,
+    1: figs.bN,
+    2: figs.bB,
+    3: figs.bQ,
+    4: figs.bK,
+    5: figs.bB,
+    6: figs.bN,
+    7: figs.bR,
+    8: figs.offBoard,
+    9: figs.offBoard,
 };
 grid[7] = {
-    '-2': fig.offBoard,
-    '-1': fig.offBoard,
-    0: fig.wR,
-    1: fig.wN,
-    2: fig.wB,
-    3: fig.wQ,
-    4: fig.wK,
-    5: fig.wB,
-    6: fig.wN,
-    7: fig.wR,
-    8: fig.offBoard,
-    9: fig.offBoard,
+    '-2': figs.offBoard,
+    '-1': figs.offBoard,
+    0: figs.wR,
+    1: figs.wN,
+    2: figs.wB,
+    3: figs.wQ,
+    4: figs.wK,
+    5: figs.wB,
+    6: figs.wN,
+    7: figs.wR,
+    8: figs.offBoard,
+    9: figs.offBoard,
 };
 
 const logGrid = () => {
@@ -185,7 +185,7 @@ const highlightSquares = (i, j) => {
     if (selected) selected.classList.remove('selected');
     const suggested = document.querySelectorAll('.suggested');
     for (const elem of suggested) elem.classList.remove('suggested');
-    if (grid[i][j] !== fig.empty) {
+    if (grid[i][j] !== figs.empty) {
         document.querySelector(`#sq_${i}${j}`).className += ' selected';
     }
 };
@@ -231,7 +231,26 @@ const clickedOnSquare = click => {
     updateListsMaterial();
     generateMoves();
     //printer();
-    searchPosition();
+    //searchPosition();
+    console.log(genPosKey());
+    console.log(gameBoard.posKey);
 };
 
 const figIndex = (fig, figNum) => (fig * 10 + figNum);
+
+const figKeys = new Array(14 * 120);
+let sideKey;
+const castleKeys = new Array(16);
+
+const rand32 = () => {
+    return (Math.floor((Math.random() * 225) + 1) << 23) |
+           (Math.floor((Math.random() * 225) + 1) << 16) |
+           (Math.floor((Math.random() * 225) + 1) << 8) |
+           Math.floor((Math.random() * 225) + 1);
+
+}
+
+const hashFig = (fig, sq) => {gameBoard.posKey ^= figKeys[(fig * 120) + sq];};
+const hashCastling = () => {gameBoard.posKey ^= castleKeys[gameBoard.castlePerm];};
+const hashSide = () => {gameBoard.posKey ^= sideKey;};
+const hashEmpersant = () => {gameBoard.posKey ^= figKeys[gameBoard.enPas];};

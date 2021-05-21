@@ -4,17 +4,17 @@ const knBiRkKi = (sq, side) => {
     let knight, bishop, rook, queen, king;
     const i = sq[0], j = sq[1];
     if (side === colors.white) {
-        knight = fig.wN;
-        bishop = fig.wB;
-        rook = fig.wR;
-        queen = fig.wQ;
-        king = fig.wK;
+        knight = figs.wN;
+        bishop = figs.wB;
+        rook = figs.wR;
+        queen = figs.wQ;
+        king = figs.wK;
     } else {
-        knight = fig.bN;
-        bishop = fig.bB;
-        rook = fig.bR;
-        queen = fig.bQ;
-        king = fig.bK;
+        knight = figs.bN;
+        bishop = figs.bB;
+        rook = figs.bR;
+        queen = figs.bQ;
+        king = figs.bK;
     }
     for (const dir of KnDir) {
         if (grid[i + dir[0]][j + dir[1]] === knight) {
@@ -24,8 +24,8 @@ const knBiRkKi = (sq, side) => {
     }
     for (const dir of BiDir) {
         let tempI = i + dir[0], tempJ = j + dir[1];
-        while (grid[tempI][tempJ] !== fig.offBoard) {
-            if (grid[tempI][tempJ] !== fig.empty) {
+        while (grid[tempI][tempJ] !== figs.offBoard) {
+            if (grid[tempI][tempJ] !== figs.empty) {
                 if (grid[tempI][tempJ] === bishop ||
                     grid[tempI][tempJ] === queen) {
                     console.log(`attacked by ${revFig[grid[tempI][tempJ]]}`);
@@ -38,8 +38,8 @@ const knBiRkKi = (sq, side) => {
     }
     for (const dir of RkDir) {
         let tempI = i + dir[0], tempJ = j + dir[1];
-        while (grid[tempI][tempJ] !== fig.offBoard) {
-            if (grid[tempI][tempJ] !== fig.empty) {
+        while (grid[tempI][tempJ] !== figs.offBoard) {
+            if (grid[tempI][tempJ] !== figs.empty) {
                 if (grid[tempI][tempJ] === rook ||
                     grid[tempI][tempJ] === queen) {
                     console.log(`attacked by ${revFig[grid[tempI][tempJ]]}`);
@@ -61,11 +61,11 @@ const knBiRkKi = (sq, side) => {
 const isSqAttackedBySide = (sq, side) => {
     const i = sq[0], j = sq[1];
     if (side === colors.white) {
-        if (grid[i + 1][j - 1] === fig.wP || grid[i + 1][j + 1] === fig.wP) {
+        if (grid[i + 1][j - 1] === figs.wP || grid[i + 1][j + 1] === figs.wP) {
             console.log('attacked by wP');
             return true;
         }
-    } else if (grid[i - 1][j - 1] === fig.bP || grid[i - 1][j + 1] === fig.bP) {
+    } else if (grid[i - 1][j - 1] === figs.bP || grid[i - 1][j + 1] === figs.bP) {
         console.log('attacked by bP');
         return true;
     }

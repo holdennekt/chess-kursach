@@ -2,7 +2,7 @@ const clearFig = sq => {
     const fig = grid[sq[0]][sq[1]];
     const col = figCol[fig];
     let tFigNum = -1;
-    gameBoard.grid[sq[0]][sq[1]] = fig.empty;
+    grid[sq[0]][sq[1]] = figs.empty;
     gameBoard.score[col] -= figValue[fig];
     for (let i = 0; i < gameBoard.figNum[fig]; i++) {
         if (gameBoard.figList[figIndex(fig, i)][0] === sq[0] &&
@@ -18,7 +18,7 @@ const clearFig = sq => {
 
 const addFig = (sq, fig) => {
     const col = figCol[fig];
-    gameBoard.grid[sq[0]][sq[1]] = fig;
+    grid[sq[0]][sq[1]] = fig;
     gameBoard.score[col] += figValue[fig];
     gameBoard.figList[figIndex(fig, gameBoard.figNum[fig])] = sq;
     gameBoard.figNum[fig]++;
@@ -26,8 +26,8 @@ const addFig = (sq, fig) => {
 
 const moveFig = (from, to) => {
     const fig = gameBoard.grid[from[0]][from[1]];
-    gameBoard.grid[from[0]][from[1]] = fig.empty;
-    gameBoard.grid[to[0]][to[1]] = fig;
+    grid[from[0]][from[1]] = figs.empty;
+    grid[to[0]][to[1]] = fig;
     for (let i = 0; i < gameBoard.figNum[fig]; i++) {
         if (gameBoard.figList[figIndex(fig, i)] === from) {
             gameBoard.figList[figIndex(fig, i)] = to;
