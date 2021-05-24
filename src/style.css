@@ -1,16 +1,39 @@
 #container {
+    position: relative;
     width: 800px;
     height: 800px;
     border: 3px solid grey;
     margin: auto;
 }
 .square {
+    position: absolute;
     width:100px;
     height:100px;
-    display:inline-block;
-    margin-bottom:-0px;
-    text-align:center;
 }
+
+.figure {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+}
+
+.rank0 { top: 0%; }
+.rank1 { top: 12.5%; }
+.rank2 { top: 25%; }
+.rank3 { top: 37.5%; }
+.rank4 { top: 50%; }
+.rank5 { top: 62.5%; }
+.rank6 { top: 75%; }
+.rank7 { top: 87.5%; }
+
+.file0 { left: 0%; }
+.file1 { left: 12.5%; }
+.file2 { left: 25%; }
+.file3 { left: 37.5%; }
+.file4 { left: 50%; }
+.file5 { left: 62.5%; }
+.file6 { left: 75%; }
+.file7 { left: 87.5%; }
 
 .light {
     background-color: rgb(174, 221, 228);

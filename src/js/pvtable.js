@@ -19,7 +19,7 @@ const probePvTable = () => {
     if (gameBoard.pvTable[index].posKey === gameBoard.posKey) {
         return gameBoard.pvTable[index].move;
     }
-    return emptMove();
+    return emptyMove();
 };
 
 const storePvMove = (move) => {

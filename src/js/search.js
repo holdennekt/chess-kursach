@@ -47,7 +47,7 @@ const alphaBeta = (alpha, beta, depth) => {
     // order pv move
     
     let legal = 0;
-    let oldAlpha = alpha, bestMove = emptMove();
+    let oldAlpha = alpha, bestMove = emptyMove();
     const start = gameBoard.moveListStart[gameBoard.ply];
     const end = gameBoard.moveListStart[gameBoard.ply + 1];
     for (let index = start; start < end; index++) {

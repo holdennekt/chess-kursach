@@ -141,53 +141,45 @@ const logGrid = () => {
 
 const createSquares = block => {                //defining divs in container
     let light = 0;
-    const divs = [[], [], [], [], [], [], [], []];
     for (let i = 0; i < 8; i++) {
         light ^= 1;
         for (let j = 0; j < 8; j++) {
             const div = document.createElement('div');
             div.id = 'sq_' + i + j;
-            div.className = 'square';
+            div.className = `square rank${i} file${j}`;
             if (light === 1) div.className += ' light';
             else div.className += ' dark';
-            div.innerHTML = div.id;
             block.append(div);
             light ^= 1;
-            divs[i].push(div);
         }
     }
-    return divs;
 };
 
-const fillSquares = divs => {
-    let url;
-    for (let i = 0; i < 2; i++) {
-        for (let j = 0; j < 8; j++) {
-            url = `url('icons/${grid[i][j]}.png')`;
-            divs[i][j].style.backgroundImage = url;
-        }
+const clearSquares = block => {
+    const figures = block.querySelectorAll('.figure');
+    if (figures.length === 0) return undefined;
+    for (const figure in figures) {
+        block.removeChild(figure);
     }
-    for (let i = 6; i < 8; i++) {
+};
+
+const fillFigures = block => {
+    clearSquares(block);
+    for (let i = 0; i < 8; i++) {
         for (let j = 0; j < 8; j++) {
-            url = `url('icons/${grid[i][j]}.png')`;
-            divs[i][j].style.backgroundImage = url;
+            if (grid[i][j] >= 1 && grid[i][j] <= 12) {
+                let img = new Image();
+                img.src = `icons/${grid[i][j]}.png`;
+                img.className = `figure rank${i} file${j}`;
+                block.append(img);
+            }
         }
     }
 };
 
 const createBoard = block => {
-    const divs = createSquares(block);
-    fillSquares(divs);
-};
-
-const highlightSquares = (i, j) => {
-    const selected = document.querySelector('.selected');
-    if (selected) selected.classList.remove('selected');
-    const suggested = document.querySelectorAll('.suggested');
-    for (const elem of suggested) elem.classList.remove('suggested');
-    if (grid[i][j] !== figs.empty) {
-        document.querySelector(`#sq_${i}${j}`).className += ' selected';
-    }
+    createSquares(block);
+    fillFigures(block);
 };
 
 const printer = () => {
@@ -203,6 +195,8 @@ const printer = () => {
     }
 };
 
+const figIndex = (fig, figNum) => (fig * 10 + figNum);
+
 const arr0 = n => {
     const res = [];
     for (let i = 0; i < n; i++) res.push(0);
@@ -216,7 +210,6 @@ const arrOfObj = n => {
     return res;
 }
 const arr = n => new Array(n);
-
 const arrOfEmptyObjects = n => {
     const res = [];
     for (let i = 0; i < n; i++) {
@@ -224,41 +217,20 @@ const arrOfEmptyObjects = n => {
     }
     return res;
 }
-
-const emptMove = () => ({from: 0, to: 0});
-
-const clickedOnSquare = click => {
-    const i = parseInt(click.target.id[3]), j = parseInt(click.target.id[4]);
-    console.log(`clicked on (${i}, ${j}) figure is ${grid[i][j]}`);
-    highlightSquares(i, j);
-    console.log(
-        'by white', isSqAttackedBySide([i, j], colors.white),
-        'by black', isSqAttackedBySide([i, j], colors.black)
-    );
-    gameBoard.moveListStart = arr0(7);
-    updateListsMaterial();
-    generateMoves();
-    //printer();
-    //searchPosition();
-    console.log(genPosKey());
-    console.log(gameBoard.posKey);
-};
-
-const figIndex = (fig, figNum) => (fig * 10 + figNum);
-
-const figKeys = new Array(14 * 120);
-let sideKey;
-const castleKeys = new Array(16);
+const emptyMove = () => ({from: 0, to: 0});
 
 const rand32 = () => {
     return (Math.floor((Math.random() * 225) + 1) << 23) |
            (Math.floor((Math.random() * 225) + 1) << 16) |
            (Math.floor((Math.random() * 225) + 1) << 8) |
            Math.floor((Math.random() * 225) + 1);
-
 }
-
+const figKeys = new Array(14 * 120);
+let sideKey;
+const castleKeys = new Array(16);
 const hashFig = (fig, sq) => {gameBoard.posKey ^= figKeys[(fig * 120) + sq];};
-const hashCastling = () => {gameBoard.posKey ^= castleKeys[gameBoard.castlePerm];};
+const hashCastling = () => {
+    gameBoard.posKey ^= castleKeys[gameBoard.castlePerm];
+};
 const hashSide = () => {gameBoard.posKey ^= sideKey;};
 const hashEmpersant = () => {gameBoard.posKey ^= figKeys[gameBoard.enPas];};

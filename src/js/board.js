@@ -53,7 +53,6 @@ const updateListsMaterial = () => {
 const genPosKey = () => {
 	let finalKey = 0;
 	let fig = figs.empty;
-
 	for (let i = 0; i < 8; i++){
 		for (let j = 0; j < 8; j++){
 			fig = grid[i][j];
@@ -62,18 +61,13 @@ const genPosKey = () => {
 			}
 		}
 	}
-
 	if (gameBoard.side === colors.white) {
 		finalKey ^= sideKey;
 	}
-
 	if (gameBoard.enPas[0] !== -1 && gameBoard.enPas[1] !== -1) {
 		finalKey ^= figKeys[gameBoard.enPas];
 	}
-
 	finalKey ^= castleKeys[gameBoard.castlePerm];
-
 	return finalKey;
-
 }
 

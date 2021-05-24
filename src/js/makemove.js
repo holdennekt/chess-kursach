@@ -36,7 +36,7 @@ const moveFig = (from, to) => {
     }
 };
 
-const checkCastlePerm = (from, to) => {
+const updateCastlePerm = (from, to) => {
     if (from[0] === 0 && from[1] === 0) {
         gameBoard.castlePerm.blackQSide = false; 
     }
@@ -80,8 +80,8 @@ const checkCastlePerm = (from, to) => {
 }
 
 const makeMove = move => {
-    console.log(move);
     const side = gameBoard.side;
+    let temp
     if (move.flag.enPas) {
         if (side === colors.white) {
             clearFig(move.to[0] + 1, move.to[1]);
@@ -108,33 +108,27 @@ const makeMove = move => {
             //moveFig([0, 0], [0, 3]);
             break;
     }
-
-    if (gameBoard.enPas != figs.offBoard) hashEmpersant();
+    if (gameBoard.enPas[0] !== -1 &&
+        gameBoard.enPas[1] !== -1) hashEmpersant();
     hashCastling();
-
     gameBoard.history[gameBoard.hisPly].move = move;
     gameBoard.history[gameBoard.hisPly].fiftyMove = gameBoard.fiftyMove;
     gameBoard.history[gameBoard.hisPly].enPas = gameBoard.enPas;
     gameBoard.history[gameBoard.hisPly].castlePerm = gameBoard.castlePerm;
-
-    checkCastlePerm(move.from, move.to);
+    updateCastlePerm(move.from, move.to);
     gameBoard.enPas = [-1, -1];
-
     hashCastling();
-
     gameBoard.fiftyMove++; 
-
     if (move.captured !== 0) {
         clearFig(to);
         gameBoard.fiftyMove = 0;
     }
-
     gameBoard.hisPly++;
     gameBoard.ply++;
-
-    if (grid[move.from[0]][move.from[1]] === 1 || grid[move.from[0]][move.from[1]] === 7) {
+    temp = grid[move.from[0]][move.from[1]] === 1 ||
+            grid[move.from[0]][move.from[1]] === 7;
+    if (temp) {
         gameBoard.fiftyMove = 0;
-
         if (move.pawnStart) {
             if (side === colors.white) {
                 gameBoard.enPas[0] = from[0] - 1;
@@ -146,22 +140,18 @@ const makeMove = move => {
             hashEmpersant();
         }
     }
-
     moveFig(move.from, move.to);
-
     if (move.promoted !== figs.empty) {
         clearFig(to);
         addFig(to, move.promoted);
     }
-
     gameBoard.side ^= 1;
     hashSide();
-
-    if (isSqAttackedBySide(gameBoard.figList[figIndex(kings[side], 0)], gameBoard.side)) {
+    temp = gameBoard.figList[figIndex(kings[side], 0)];
+    if (isSqAttackedBySide(temp, gameBoard.side)) {
         // takeMove();
         return false;
     }
-
     return true;
 };
 // add some to defs and board for makeMover
