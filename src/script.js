@@ -12,6 +12,7 @@ window.onload = onLoad;
 function onLoad() {
     init();
     updateListsMaterial();
+    generateMoves();
 }
 
 const initBoardVars = () => {

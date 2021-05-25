@@ -58,16 +58,21 @@
     background-image: url('icons/dot.png');
 }
 
+.suggestedCapture {
+    background-image: url('icons/capture.png');
+}
+
 .promotion {
     position: absolute;
+    left: auto;
+    top: auto;
+    padding: auto;
     width: 420px;
     height: 120px;
     border: 3px solid black;
-    margin: auto;
 }
 
 .suggestion {
     display: inline-block;
-    margin: auto;
     border: 2px solid black;
 }

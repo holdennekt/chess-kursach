@@ -5,18 +5,18 @@ const userMove = {
 };
 
 const chosen = (click) => {
-    const clikedOn = click.target.id;
+    const clickedOn = click.target.id;
     userMove.promoted = figs[clickedOn];
-    document.removeChild(document.querySelector('.promotion'));
+    document.body.removeChild(document.querySelector('.promotion'));
 };
 
 const suggestPromotion = () => {
     let blockPromotion = document.createElement('div');
     blockPromotion.className = 'promotion';
-    document.append(blockPromotion);
+    document.body.appendChild(blockPromotion);
     let list;
-    if (gameBoard.side === colors.white) list = ['wQ', 'wR', 'wB', 'wK'];
-    else list = ['bQ', 'bR', 'bB', 'bK'];
+    if (gameBoard.side === colors.white) list = ['wQ', 'wR', 'wB', 'wN'];
+    else list = ['bQ', 'bR', 'bB', 'bN'];
     for (const elem of list) {
         let img = new Image();
         img.src = `icons/${figs[elem]}.png`;
@@ -28,7 +28,7 @@ const suggestPromotion = () => {
 };
 
 const parseMove = (from, to, promoted = figs.empty) => {
-    generateMoves();
+    // generateMoves();
     const start = gameBoard.moveListStart[gameBoard.ply];
     const end = gameBoard.moveListStart[gameBoard.ply + 1];
     let found = false, move;
@@ -63,19 +63,29 @@ const parseMove = (from, to, promoted = figs.empty) => {
 const deselectSquares = () => {
     const selected = document.querySelector('.selected');
     if (selected) selected.classList.remove('selected');
+    const suggested = document.querySelectorAll('.suggested');
+    const capture = document.querySelectorAll('.suggestedCapture');
+    for (const elem of suggested) elem.classList.remove('suggested');
+    for (const elem of capture) elem.classList.remove('suggestedCapture');
 };
 
-const selectSquares = (i, j) => {
+const selectSquares = (i, j, suggest = []) => {
     deselectSquares();
-    const suggested = document.querySelectorAll('.suggested');
-    for (const elem of suggested) elem.classList.remove('suggested');
-    if (grid[i][j] > figs.empty && grid[i][j] < figs.bP) {
-        document.querySelector(`#sq_${i}${j}`).className += ' selected';
+    if (figCol[grid[i][j]] === gameBoard.side) {
+        let str = `.rank${i}.file${j}`;
+        document.querySelectorAll(str)[0].className += ' selected';
+        for (const elem of suggest) {
+            str = `.rank${elem.to[0]}.file${elem.to[1]}`;
+            if (elem.captured === figs.empty) {
+                document.querySelectorAll(str)[0].className += ' suggested';
+            }
+            else document.querySelectorAll(str)[0].className += ' suggestedCapture';
+        }
     }
 };
 
 const clickedOnSquare = (i, j) => {
-    console.log(`clicked on square_${i}${j}`);
+    // console.log(`clicked on square_${i}${j}`);
     if (userMove.from[0] !== -1 && userMove.from[1] !== -1) {
         userMove.to[0] = i, userMove.to[1] = j;
         makeUserMove();
@@ -84,11 +94,18 @@ const clickedOnSquare = (i, j) => {
 
 const clickedOnFigure = (i, j) => {
     selectSquares(i, j);
-    console.log(`clicked on figure ${grid[i][j]} at square_${i}${j}`);
-    if (userMove.from[0] === -1 && userMove.from[1] === -1) {
+    // console.log(`clicked on figure ${grid[i][j]} at square_${i}${j}`);
+    if (userMove.from[0] === -1 && userMove.from[1] === -1 &&
+        figCol[grid[i][j]] === gameBoard.side) {
         userMove.from[0] = i, userMove.from[1] = j;
+    } else if (userMove.from[0] === -1 && userMove.from[1] === -1 &&
+                figCol[grid[i][j]] !== gameBoard.side) {
+        return;
     } else {
-        userMove.to[0] = i, userMove.to[1] = j;
+        const figFrom = grid[userMove.from[0]][userMove.from[1]];
+        if (figCol[grid[i][j]] === figCol[figFrom]) {
+            userMove.from[0] = i, userMove.from[1] = j;
+        } else userMove.to[0] = i, userMove.to[1] = j;
     }
     makeUserMove();
 }
@@ -96,7 +113,8 @@ const clickedOnFigure = (i, j) => {
 const removeGuiFig = sq => {
     const str = `.figure.rank${sq[0]}.file${sq[1]}`;
     const figOnSq = document.querySelectorAll(str)[0];
-    document.querySelector('#container').removeChild(figOnSq);
+    console.log(str, figOnSq);
+    document.querySelector('#container').remove(figOnSq);
 };
 
 const addGuiFig = (sq, fig) => {
@@ -108,18 +126,21 @@ const addGuiFig = (sq, fig) => {
 };
 
 const moveGuiFig = move => {
+    console.log(move);
     if (move.flag.enPas) {
         let epRemove;
         if (gameBoard.side === colors.white) {
-            epRemove = [move.to[0] + 1, move.to[1]];
+            epRemove = [move.to[0] - 1, move.to[1]];
         }
-        else epRemove = [move.to[0] - 1, move.to[1]];
+        else epRemove = [move.to[0] + 1, move.to[1]];
+        console.log('EPREMOVE', epRemove, move.captured);
         removeGuiFig(epRemove);
     } else if (move.captured !== figs.empty) {
         removeGuiFig(move.to);
     }
     const str = `.figure.rank${move.from[0]}.file${move.from[1]}`;
     const figOnSq = document.querySelectorAll(str)[0];
+    console.log([move.from[0], move.from[1]], str, document.querySelectorAll('.figure.rank1'));
     figOnSq.classList.remove(`rank${move.from[0]}`, `file${move.from[1]}`);
     figOnSq.classList.add(`rank${move.to[0]}`, `file${move.to[1]}`);
     switch (move.flag.castling) {
@@ -138,7 +159,7 @@ const moveGuiFig = move => {
             break;
         case 'blackQSide':
             removeGuiFig([0, 0]);
-            addGuiFig([0, 5], figs.bR);
+            addGuiFig([0, 3], figs.bR);
             break;
     }
     if (move.promoted !== figs.empty) {
@@ -149,6 +170,20 @@ const moveGuiFig = move => {
 
 const makeUserMove = () => {
     const from = userMove.from, to = userMove.to;
+    if (from[0] !== -1 && from[1] !== -1) {
+        const start = gameBoard.moveListStart[gameBoard.ply];
+        const end = gameBoard.moveListStart[gameBoard.ply + 1];
+        const suggest = [];
+        for (let index = start; index < end; index++) {
+            let move = gameBoard.moveList[index];
+            if (from[0] === move.from[0] && from[1] === move.from[1] &&
+                isMoveLegal(move)) {
+                suggest.push(move);
+            }
+        }
+        selectSquares(from[0], from[1], suggest);
+        console.log(suggest);
+    }
     if (from[0] !== -1 && from[1] !== -1 &&
         to[0] !== -1 && to[1] !== -1) {
         if (grid[from[0]][from[1]] === 1 && from[0] === 1 ||
@@ -156,7 +191,6 @@ const makeUserMove = () => {
             suggestPromotion();
         }
         const parsed = parseMove(from, to, userMove.promoted);
-        console.log(parsed);
         if (parsed.from[0] !== -1 && parsed.from[1] !== -1 &&
             parsed.to[0] !== -1 && parsed.to[1] !== -1) {
             makeMove(parsed);
@@ -167,6 +201,7 @@ const makeUserMove = () => {
         console.log('user move' + from[0] + from[1] + ' -> ' + to[0] + to[1]);
         userMove.from = [-1, -1];
         userMove.to = [-1, -1];
+        generateMoves();
     }
 };
 

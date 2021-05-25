@@ -207,6 +207,17 @@ const arrOfEmptyObjects = n => {
     }
     return res;
 }
+const cloneObj = obj => {
+    const clone = {};
+    for (const i in obj) {
+        if (typeof obj[i] === 'object') {
+            clone[i] =  cloneObj(obj[i]);
+        }
+        else clone[i] = obj[i];
+    }
+    return clone;
+};
+
 const emptyMove = () => ({ from: 0, to: 0 });
 const noMove = () => ({ from: [-1, -1], to: [-1, -1] });
 const rand32 = () => {

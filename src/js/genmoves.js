@@ -102,11 +102,13 @@ const blackPawns = () => {
         if (gameBoard.enPas[0] !== -1) {
             if (sq[0] + 1 === gameBoard.enPas[0] &&
                 sq[1] - 1 === gameBoard.enPas[1]) {
+                console.log('ENPAS EST, SQ is', sq);
                 addMove(sq, [sq[0] + 1, sq[1] - 1], figs.empty,
                     figs.empty, flag(true));
             }
             if (sq[0] + 1 === gameBoard.enPas[0] &&
                 sq[1] + 1 === gameBoard.enPas[1]) {
+                    console.log('ENPAS EST, SQ is', sq);
                 addMove(sq, [sq[0] + 1, sq[1] + 1], figs.empty,
                     figs.empty, flag(true));
             }

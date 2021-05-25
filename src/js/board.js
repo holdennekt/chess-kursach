@@ -45,9 +45,9 @@ const updateListsMaterial = () => {
             }
         }
     }
-    console.log(
-        'white score =', gameBoard.score[0], 'black score =', gameBoard.score[1]
-    );
+    // console.log(
+    //     'white score =', gameBoard.score[0], 'black score =', gameBoard.score[1]
+    // );
 };
 
 const genPosKey = () => {
