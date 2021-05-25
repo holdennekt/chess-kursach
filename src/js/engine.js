@@ -18,7 +18,7 @@ const knBiRkKi = (sq, side, obj) => {
     }
     for (const dir of KnDir) {
         if (obj[i + dir[0]][j + dir[1]] === knight) {
-            console.log(`attacked by ${revFig[obj[i + dir[0]][j + dir[1]]]}`);
+            // console.log(`attacked by ${revFigs[obj[i + dir[0]][j + dir[1]]]}`);
             return true;
         }
     }
@@ -28,7 +28,7 @@ const knBiRkKi = (sq, side, obj) => {
             if (obj[tempI][tempJ] !== figs.empty) {
                 if (obj[tempI][tempJ] === bishop ||
                     obj[tempI][tempJ] === queen) {
-                    console.log(`attacked by ${revFig[obj[tempI][tempJ]]}`);
+                    // console.log(`attacked by ${revFigs[obj[tempI][tempJ]]}`);
                     return true;
                 }
                 break;
@@ -42,7 +42,7 @@ const knBiRkKi = (sq, side, obj) => {
             if (obj[tempI][tempJ] !== figs.empty) {
                 if (obj[tempI][tempJ] === rook ||
                     obj[tempI][tempJ] === queen) {
-                    console.log(`attacked by ${revFig[obj[tempI][tempJ]]}`);
+                    // console.log(`attacked by ${revFigs[obj[tempI][tempJ]]}`);
                     return true;
                 }
                 break;
@@ -52,7 +52,7 @@ const knBiRkKi = (sq, side, obj) => {
     }
     for (const dir of KiDir) {
         if (obj[i + dir[0]][j + dir[1]] === king) {
-            console.log(`attacked by ${revFig[obj[i + dir[0]][j + dir[1]]]}`);
+            // console.log(`attacked by ${revFigs[obj[i + dir[0]][j + dir[1]]]}`);
             return true;
         }
     }
@@ -62,11 +62,11 @@ const isSqAttackedBySide = (sq, side, obj = grid) => {
     const i = sq[0], j = sq[1];
     if (side === colors.white) {
         if (obj[i + 1][j - 1] === figs.wP || obj[i + 1][j + 1] === figs.wP) {
-            console.log('attacked by wP');
+            // console.log('attacked by wP');
             return true;
         }
     } else if (obj[i - 1][j - 1] === figs.bP || obj[i - 1][j + 1] === figs.bP) {
-        console.log('attacked by bP');
+        // console.log('attacked by bP');
         return true;
     }
     return knBiRkKi([i, j], side, obj);

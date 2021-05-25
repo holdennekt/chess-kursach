@@ -6,7 +6,7 @@ const figs = {
     bP: 7,    bN: 8,    bB: 9,    bR: 10,    bQ: 11,    bK: 12,
 };
 
-const revFig = [
+const revFigs = [
     '. ',
     'wP', 'wN', 'wB', 'wR', 'wQ', 'wK',
     'bP', 'bN', 'bB', 'bR', 'bQ', 'bK'
@@ -121,8 +121,8 @@ const logGrid = () => {
         if (i === '-2' || i === '-1' || i === '8' || i === '9') continue;
         let row = grid[i];
         console.log(
-            i, revFig[row[0]], revFig[row[1]], revFig[row[2]],
-            revFig[row[3]], revFig[row[4]], revFig[row[5]], revFig[row[6]], revFig[row[7]]
+            i, revFigs[row[0]], revFigs[row[1]], revFigs[row[2]],
+            revFigs[row[3]], revFigs[row[4]], revFigs[row[5]], revFigs[row[6]], revFigs[row[7]]
         );
     }
 };
@@ -177,10 +177,10 @@ const printer = () => {
         const from = move.from, to = move.to;
         if (move.from === undefined) break;
         console.log(
-            revFig[grid[from[0]][from[1]]], from[0], from[1],
+            revFigs[grid[from[0]][from[1]]], from[0], from[1],
             '| to', to[0], to[1],
-            '| captured', revFig[move.captured],
-            '| promoted to', revFig[move.promoted]
+            '| captured', revFigs[move.captured],
+            '| promoted to', revFigs[move.promoted]
         );
     }
 };

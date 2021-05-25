@@ -28,19 +28,18 @@ const suggestPromotion = () => {
 };
 
 const parseMove = (from, to, promoted = figs.empty) => {
-    // generateMoves();
     const start = gameBoard.moveListStart[gameBoard.ply];
     const end = gameBoard.moveListStart[gameBoard.ply + 1];
     let found = false, move;
     for (let index = start; index < end; index++) {
         move = gameBoard.moveList[index];
-        // console.log(move);
         const fromI = move.from[0], fromJ = move.from[1];
         const toI = move.to[0], toJ = move.to[1];
         if (from[0] === fromI && from[1] === fromJ &&
             to[0] === toI && to[1] === toJ) {
             if (promoted !== figs.empty) {
                 if (move.promoted === promoted) {
+                    console.log('PROMOTED TO', revFigs[promoted]);
                     found = true;
                     break;
                 }
@@ -51,10 +50,9 @@ const parseMove = (from, to, promoted = figs.empty) => {
         }
     }
     if (found) {
-        if (!makeMove(move)) {
+        if (!isMoveLegal(move)) {
             return noMove();
         }
-        takeMove();
         return move;
     }
     return noMove();
@@ -186,6 +184,7 @@ const makeUserMove = () => {
             suggestPromotion();
         }
         const parsed = parseMove(from, to, userMove.promoted);
+        console.log(parsed);
         if (parsed.from[0] !== -1 && parsed.from[1] !== -1 &&
             parsed.to[0] !== -1 && parsed.to[1] !== -1) {
             makeMove(parsed);
