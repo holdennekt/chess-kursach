@@ -113,8 +113,7 @@ const clickedOnFigure = (i, j) => {
 const removeGuiFig = sq => {
     const str = `.figure.rank${sq[0]}.file${sq[1]}`;
     const figOnSq = document.querySelectorAll(str)[0];
-    console.log(str, figOnSq);
-    document.querySelector('#container').remove(figOnSq);
+    document.querySelector('#container').removeChild(figOnSq);
 };
 
 const addGuiFig = (sq, fig) => {
@@ -133,14 +132,12 @@ const moveGuiFig = move => {
             epRemove = [move.to[0] - 1, move.to[1]];
         }
         else epRemove = [move.to[0] + 1, move.to[1]];
-        console.log('EPREMOVE', epRemove, move.captured);
         removeGuiFig(epRemove);
     } else if (move.captured !== figs.empty) {
         removeGuiFig(move.to);
     }
     const str = `.figure.rank${move.from[0]}.file${move.from[1]}`;
     const figOnSq = document.querySelectorAll(str)[0];
-    console.log([move.from[0], move.from[1]], str, document.querySelectorAll('.figure.rank1'));
     figOnSq.classList.remove(`rank${move.from[0]}`, `file${move.from[1]}`);
     figOnSq.classList.add(`rank${move.to[0]}`, `file${move.to[1]}`);
     switch (move.flag.castling) {
