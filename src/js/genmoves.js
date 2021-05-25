@@ -120,9 +120,9 @@ const castle = side => {
     else i = 0, str = 'black';
     if (gameBoard.castlePerm[str + 'KSide']) {
         if (grid[i][5] === figs.empty && grid[i][6] === figs.empty) {
-            if (!isSqAttackedBySide(i, 4, colors[str]) &&
-                !isSqAttackedBySide(i, 5, colors[str]) &&
-                !isSqAttackedBySide(i, 6, colors[str])) {
+            if (!isSqAttackedBySide([i, 4], colors[str]^1) &&
+                !isSqAttackedBySide([i, 5], colors[str]^1) &&
+                !isSqAttackedBySide([i, 6], colors[str]^1)) {
                 addMove([i, 4], [i, 6], figs.empty,
                     figs.empty, flag(false, false, str + 'KSide'));
             }
@@ -132,9 +132,9 @@ const castle = side => {
         if (grid[i][1] === figs.empty &&
             grid[i][2] === figs.empty &&
             grid[i][3] === figs.empty) {
-            if (!isSqAttackedBySide(i, 2, colors[str]) &&
-                !isSqAttackedBySide(i, 3, colors[str]) &&
-                !isSqAttackedBySide(i, 4, colors[str])) {
+            if (!isSqAttackedBySide([i, 2], colors[str]^1) &&
+                !isSqAttackedBySide([i, 3], colors[str]^1) &&
+                !isSqAttackedBySide([i, 4], colors[str]^1)) {
                 addMove([i, 4], [i, 2], figs.empty,
                     figs.empty, flag(false, false, str + 'QSide'));
             }

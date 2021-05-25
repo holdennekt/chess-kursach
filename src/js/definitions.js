@@ -5,8 +5,9 @@ const figs = {
     wP: 1,    wN: 2,    wB: 3,    wR: 4,    wQ: 5,    wK: 6,
     bP: 7,    bN: 8,    bB: 9,    bR: 10,    bQ: 11,    bK: 12,
 };
+
 const revFig = [
-    'none',
+    '. ',
     'wP', 'wN', 'wB', 'wR', 'wQ', 'wK',
     'bP', 'bN', 'bB', 'bR', 'bQ', 'bK'
 ];
@@ -116,24 +117,13 @@ grid[7] = {
 };
 
 const logGrid = () => {
-    let row = grid[-2];
-    console.log(
-        row[-2], row[-1], row[0], row[1], row[2],
-        row[3], row[4], row[5], row[6], row[7], row[8], row[9]
-    );
-    row = grid[-1];
-    console.log(
-        row[-2], row[-1], row[0], row[1], row[2],
-        row[3], row[4], row[5], row[6], row[7], row[8], row[9]
-    );
     for (const i in grid) {
-        if (i !== '-2' && i !== '-1') {
-            row = grid[i];
-            console.log(
-                row[-2], row[-1], row[0], row[1], row[2],
-                row[3], row[4], row[5], row[6], row[7], row[8], row[9]
-            );
-        }
+        if (i === '-2' || i === '-1' || i === '8' || i === '9') continue;
+        let row = grid[i];
+        console.log(
+            i, revFig[row[0]], revFig[row[1]], revFig[row[2]],
+            revFig[row[3]], revFig[row[4]], revFig[row[5]], revFig[row[6]], revFig[row[7]]
+        );
     }
 };
 

@@ -2,8 +2,6 @@ const userMove = {
     from: [-1, -1],
     to: [-1, -1],
     promoted: figs.empty,
-    captured: figs.empty,
-    flag: { enPas: 0, pawnStart: false, castling: ''},
 };
 
 const chosen = (click) => {
@@ -36,6 +34,7 @@ const parseMove = (from, to, promoted = figs.empty) => {
     let found = false, move;
     for (let index = start; index < end; index++) {
         move = gameBoard.moveList[index];
+        // console.log(move);
         const fromI = move.from[0], fromJ = move.from[1];
         const toI = move.to[0], toJ = move.to[1];
         if (from[0] === fromI && from[1] === fromJ &&
@@ -84,6 +83,7 @@ const clickedOnSquare = (i, j) => {
 }
 
 const clickedOnFigure = (i, j) => {
+    selectSquares(i, j);
     console.log(`clicked on figure ${grid[i][j]} at square_${i}${j}`);
     if (userMove.from[0] === -1 && userMove.from[1] === -1) {
         userMove.from[0] = i, userMove.from[1] = j;
@@ -178,6 +178,5 @@ const clicked = click => {
     const targetClass = click.target.className;
     if (targetClass.includes('square')) clickedOnSquare(i, j);
     else if (targetClass.includes('figure')) clickedOnFigure(i, j);
-    selectSquares(i, j);
     updateListsMaterial();
 };

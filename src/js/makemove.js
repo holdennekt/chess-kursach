@@ -26,6 +26,7 @@ const addFig = (sq, fig) => {
 
 const moveFig = (from, to) => {
     const fig = grid[from[0]][from[1]];
+    console.log('figure moving ', fig, 'from ', from, to);
     grid[from[0]][from[1]] = figs.empty;
     grid[to[0]][to[1]] = fig;
     for (let i = 0; i < gameBoard.figNum[fig]; i++) {
@@ -81,7 +82,7 @@ const updateCastlePerm = (from, to) => {
 
 const makeMove = move => {
     const side = gameBoard.side;
-    let temp
+    let temp;
     if (move.flag.enPas) {
         if (side === colors.white) {
             clearFig([move.to[0] + 1, move.to[1]]);
@@ -93,19 +94,15 @@ const makeMove = move => {
         case '': break;
         case 'whiteKSide':
             moveFig([7, 7], [7, 5]);
-            //moveFig([7, 7], [7, 5]);
             break;
         case 'whiteQSide':
             moveFig([7, 0], [7, 3]);
-            //moveFig([7, 0], [7, 3]);
             break;
         case 'blackKSide':
             moveFig([0, 7], [0, 5]);
-            //moveFig([0, 7], [0, 5]);
             break;
         case 'blackQSide':
             moveFig([0, 0], [0, 3]);
-            //moveFig([0, 0], [0, 3]);
             break;
     }
     if (gameBoard.enPas[0] !== -1 &&
@@ -120,7 +117,7 @@ const makeMove = move => {
     hashCastling();
     gameBoard.fiftyMove++; 
     if (move.captured !== 0) {
-        clearFig(to);
+        clearFig(move.to);
         gameBoard.fiftyMove = 0;
     }
     gameBoard.hisPly++;
@@ -140,12 +137,14 @@ const makeMove = move => {
             hashEmpersant();
         }
     }
+    console.log(move.from, move.to, grid[move.from[0]][move.from[1]]);
     moveFig(move.from, move.to);
     if (move.promoted !== figs.empty) {
         clearFig(to);
         addFig(to, move.promoted);
     }
     gameBoard.side ^= 1;
+    console.log('SIDE IS', gameBoard.side);
     hashSide();
     temp = gameBoard.figList[figIndex(kings[side], 0)];
     if (isSqAttackedBySide(temp, gameBoard.side)) {
@@ -154,10 +153,8 @@ const makeMove = move => {
     }
     return true;
 };
-// add some to defs and board for makeMover
-//obj move.to/from
-const takeMove = () => {
 
+const takeMove = () => {
     gameBoard.hisPly--;
     gameBoard.ply--;
 
@@ -180,40 +177,35 @@ const takeMove = () => {
 
     if (move.flag.enPas) {
         if (gameBoard.side === colors.white) {
-            addFig ([move.to[0] + 1, move.to[1]], figs.bP);
+            addFig([move.to[0] + 1, move.to[1]], figs.bP);
         } else {
-            addFig ([move.to[0] - 1, move.to[1]], figs.wP);
+            addFig([move.to[0] - 1, move.to[1]], figs.wP);
         }
     } 
     switch (move.flag.castling) {
-            case '': break;
-            case 'whiteKSide':
-                moveFig([7, 5], [7, 7]);
-                //moveFig([7, 7], [7, 5]);
-                break;
-            case 'whiteQSide':
-                moveFig([7, 3], [7, 0]);
-                //moveFig([7, 0], [7, 3]);
-                break;
-            case 'blackKSide':
-                moveFig([0, 5], [0, 7]);
-                //moveFig([0, 7], [0, 5]);
-                break;
-            case 'blackQSide':
-                moveFig([0, 3], [0, 0]);
-                //moveFig([0, 0], [0, 3]);
-                break;
-        }
+        case '': break;
+        case 'whiteKSide':
+            moveFig([7, 5], [7, 7]);
+            break;
+        case 'whiteQSide':
+            moveFig([7, 3], [7, 0]);
+            break;
+        case 'blackKSide':
+            moveFig([0, 5], [0, 7]);
+            break;
+        case 'blackQSide':
+            moveFig([0, 3], [0, 0]);
+            break;
+    }
 
-        moveFig(move.to, move.from);
+    moveFig(move.to, move.from);
 
-        if (move.captured !== figs.empty) {
-            addFig(move.to, move.captured);
-        }
+    if (move.captured !== figs.empty) {
+        addFig(move.to, move.captured);
+    }
 
-        if (move.flag.promoted !== figs.empty) {
-            clearFig(move.from);
-            addFig(move.from, (figCol[move.promoted] === colors.white ? figs.wP : figs.bP));
-        }
-
-} 
+    if (move.promoted !== figs.empty) {
+        clearFig(move.from);
+        addFig(move.from, (figCol[move.promoted] === colors.white ? figs.wP : figs.bP));
+    }
+};
