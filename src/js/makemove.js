@@ -130,14 +130,11 @@ const makeMove = move => {
             if (side === colors.white) {
                 gameBoard.enPas[0] = move.from[0] - 1;
                 gameBoard.enPas[1] = move.from[1];
-                console.log('DOBAVLEN ENPAS', [move.from[0] - 1, move.from[0]]);
             } else {
                 gameBoard.enPas[0] = move.from[0] + 1;
                 gameBoard.enPas[1] = move.from[1];
-                console.log('DOBAVLEN ENPAS', gameBoard.enPas);
             }
             hashEmpersant();
-            console.log('MOVE IS', move.from, move.to);
         }
     }
     moveFig(move.from, move.to);
