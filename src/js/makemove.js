@@ -84,27 +84,27 @@ const makeMove = move => {
     let temp
     if (move.flag.enPas) {
         if (side === colors.white) {
-            clearFig(move.to[0] + 1, move.to[1]);
+            clearFig([move.to[0] + 1, move.to[1]]);
         } else {
-            clearFig(move.to[0] - 1, move.to[1]);
+            clearFig([move.to[0] - 1, move.to[1]]);
         }
     }
     switch (move.flag.castling) {
         case '': break;
         case 'whiteKSide':
-            moveFig([7, 4], [7, 6]);
+            moveFig([7, 7], [7, 5]);
             //moveFig([7, 7], [7, 5]);
             break;
         case 'whiteQSide':
-            moveFig([7, 4], [7, 2]);
+            moveFig([7, 0], [7, 3]);
             //moveFig([7, 0], [7, 3]);
             break;
         case 'blackKSide':
-            moveFig([0, 4], [0, 6]);
+            moveFig([0, 7], [0, 5]);
             //moveFig([0, 7], [0, 5]);
             break;
         case 'blackQSide':
-            moveFig([0, 4], [0, 2]);
+            moveFig([0, 0], [0, 3]);
             //moveFig([0, 0], [0, 3]);
             break;
     }
@@ -149,7 +149,7 @@ const makeMove = move => {
     hashSide();
     temp = gameBoard.figList[figIndex(kings[side], 0)];
     if (isSqAttackedBySide(temp, gameBoard.side)) {
-        // takeMove();
+        takeMove();
         return false;
     }
     return true;
@@ -158,4 +158,62 @@ const makeMove = move => {
 //obj move.to/from
 const takeMove = () => {
 
-}
+    gameBoard.hisPly--;
+    gameBoard.ply--;
+
+    let move = gameBoard.history[gameBoard.hisPly].move;
+
+    if (gameBoard.enPas[0] !== -1 &&
+        gameBoard.enPas[1] !== -1) hashEmpersant();
+    hashCastling();
+
+    gameBoard.castlePerm = gameBoard.history[gameBoard.hisPly].castlePerm;
+    gameBoard.fiftyMove = gameBoard.history[gameBoard.hisPly].fiftyMove;
+    gameBoard.enPas = gameBoard.history[gameBoard.hisPly].enPas;
+
+    if (gameBoard.enPas[0] !== -1 &&
+        gameBoard.enPas[1] !== -1) hashEmpersant();
+    hashCastling();
+
+    gameBoard.side ^= 1;
+    hashSide();
+
+    if (move.flag.enPas) {
+        if (gameBoard.side === colors.white) {
+            addFig ([move.to[0] + 1, move.to[1]], figs.bP);
+        } else {
+            addFig ([move.to[0] - 1, move.to[1]], figs.wP);
+        }
+    } 
+    switch (move.flag.castling) {
+            case '': break;
+            case 'whiteKSide':
+                moveFig([7, 5], [7, 7]);
+                //moveFig([7, 7], [7, 5]);
+                break;
+            case 'whiteQSide':
+                moveFig([7, 3], [7, 0]);
+                //moveFig([7, 0], [7, 3]);
+                break;
+            case 'blackKSide':
+                moveFig([0, 5], [0, 7]);
+                //moveFig([0, 7], [0, 5]);
+                break;
+            case 'blackQSide':
+                moveFig([0, 3], [0, 0]);
+                //moveFig([0, 0], [0, 3]);
+                break;
+        }
+
+        moveFig(move.to, move.from);
+
+        if (move.captured !== figs.empty) {
+            addFig(move.to, move.captured);
+        }
+
+        if (move.flag.promoted !== figs.empty) {
+            clearFig(move.from);
+            addFig(move.from, (figCol[move.promoted] === colors.white ? figs.wP : figs.bP));
+        }
+
+} 
