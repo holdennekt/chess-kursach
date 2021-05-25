@@ -125,7 +125,6 @@ const addGuiFig = (sq, fig) => {
 };
 
 const moveGuiFig = move => {
-    console.log(move);
     if (move.flag.enPas) {
         let epRemove;
         if (gameBoard.side === colors.white) {
@@ -179,7 +178,6 @@ const makeUserMove = () => {
             }
         }
         selectSquares(from[0], from[1], suggest);
-        console.log(suggest);
     }
     if (from[0] !== -1 && from[1] !== -1 &&
         to[0] !== -1 && to[1] !== -1) {
