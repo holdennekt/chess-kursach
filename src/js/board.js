@@ -1,5 +1,5 @@
 const gameBoard = {
-    'side': colors.black,
+    'side': colors.white,
     'fiftyMove': 0,
     'hisPly': 0,
     'ply': 0,

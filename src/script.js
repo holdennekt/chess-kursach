@@ -12,8 +12,10 @@ window.onload = onLoad;
 function onLoad() {
     init();
     updateListsMaterial();
-    generateMoves();
-    makeMove(gameBoard.moveList[0]);
+    // generateMoves();
+    // makeMove(gameBoard.moveList[9]);
+    // logGrid();
+    console.log(grid[-1][0]);
 }
 
 const initBoardVars = () => {

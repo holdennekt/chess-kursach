@@ -217,8 +217,8 @@ const arrOfEmptyObjects = n => {
     }
     return res;
 }
-const emptyMove = () => ({from: 0, to: 0});
-
+const emptyMove = () => ({ from: 0, to: 0 });
+const noMove = () => ({ from: [-1, -1], to: [-1, -1] });
 const rand32 = () => {
     return (Math.floor((Math.random() * 225) + 1) << 23) |
            (Math.floor((Math.random() * 225) + 1) << 16) |

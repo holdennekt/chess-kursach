@@ -15,8 +15,15 @@
     position: absolute;
     width: 100px;
     height: 100px;
+    animation: 1s ease-in-out 0.3;
 }
 
+/* .knight {
+    animation-name: 'knightAnimation';
+}
+@keyframes knightAnimation {
+    50% {}
+} */
 .rank0 { top: 0%; }
 .rank1 { top: 12.5%; }
 .rank2 { top: 25%; }
@@ -49,4 +56,18 @@
 
 .suggested {
     background-image: url('icons/dot.png');
+}
+
+.promotion {
+    position: absolute;
+    width: 420px;
+    height: 120px;
+    border: 3px solid black;
+    margin: auto;
+}
+
+.suggestion {
+    display: inline-block;
+    margin: auto;
+    border: 2px solid black;
 }
