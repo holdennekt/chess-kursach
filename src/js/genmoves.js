@@ -1,20 +1,7 @@
-const moveExists = (move) => {
-    generateMoves();
-    const start = gameBoard.moveListStart[gameBoard.ply];
-    const end = gameBoard.moveListStart[gameBoard.ply + 1];
-    for (let index = start; index < end; index++) {
-        let moveFound = gameBoard.moveList[index];
-        if (!makeMove(moveFound)) continue;
-        takeMove();
-        if (move === moveFound) return true;
-    }
-    return false;
-};
-
-const flag = (enPas, pawnStart = false, castling = '') =>
+const Flag = (enPas = 0, pawnStart = false, castling = '') =>
     ({ enPas, pawnStart, castling });
-const defoltFlag = () => ({ enPas: 0, pawnStart: false, castling: ''});
-const addMove = (from, to, captured = 0, promoted = 0, flag = defoltFlag()) => {
+
+const addMove = (from, to, captured = 0, promoted = 0, flag = Flag()) => {
     const move = { from, to, captured, promoted, flag };
     gameBoard.moveList[gameBoard.moveListStart[gameBoard.ply + 1]] = move;
     gameBoard.moveScores[gameBoard.moveListStart[gameBoard.ply + 1]++] = 0;
@@ -50,7 +37,7 @@ const whitePawns = () => {
             addWhitePawnMove(sq, [sq[0] - 1, sq[1]]);
             if (sq[0] === 6 && grid[sq[0] - 2][sq[1]] === figs.empty) {
                 addMove(sq, [sq[0] - 2, sq[1]], figs.empty,
-                    figs.empty, flag(false, true));
+                    figs.empty, Flag(false, true));
             }
         }
         if (grid[sq[0] - 1][sq[1] - 1] > figs.empty &&
@@ -67,12 +54,12 @@ const whitePawns = () => {
             if (sq[0] - 1 === gameBoard.enPas[0] &&
                 sq[1] - 1 === gameBoard.enPas[1]) {
                 addMove(sq, [sq[0] - 1, sq[1] - 1],
-                    figs.empty, figs.empty, flag(true));
+                    figs.empty, figs.empty, Flag(true));
             }
             if (sq[0] - 1 === gameBoard.enPas[0] &&
                 sq[1] + 1 === gameBoard.enPas[1]) {
                 addMove(sq, [sq[0] - 1, sq[1] + 1],
-                    figs.empty, figs.empty, flag(true));
+                    figs.empty, figs.empty, Flag(true));
             }
         }
     }
@@ -86,7 +73,7 @@ const blackPawns = () => {
             addBlackPawnMove(sq, [sq[0] + 1, sq[1]]);
             if (sq[0] === 1 && grid[sq[0] + 2][sq[1]] === figs.empty) {
                 addMove(sq, [sq[0] + 2, sq[1]], figs.empty,
-                    figs.empty, flag(false, true));
+                    figs.empty, Flag(false, true));
             }
         }
         if (grid[sq[0] + 1][sq[1] - 1] > figs.empty &&
@@ -104,13 +91,13 @@ const blackPawns = () => {
                 sq[1] - 1 === gameBoard.enPas[1]) {
                 console.log('ENPAS EST, SQ is', sq);
                 addMove(sq, [sq[0] + 1, sq[1] - 1], figs.empty,
-                    figs.empty, flag(true));
+                    figs.empty, Flag(true));
             }
             if (sq[0] + 1 === gameBoard.enPas[0] &&
                 sq[1] + 1 === gameBoard.enPas[1]) {
-                    console.log('ENPAS EST, SQ is', sq);
+                console.log('ENPAS EST, SQ is', sq);
                 addMove(sq, [sq[0] + 1, sq[1] + 1], figs.empty,
-                    figs.empty, flag(true));
+                    figs.empty, Flag(true));
             }
         }
     }
@@ -122,11 +109,11 @@ const castle = side => {
     else i = 0, str = 'black';
     if (gameBoard.castlePerm[str + 'KSide']) {
         if (grid[i][5] === figs.empty && grid[i][6] === figs.empty) {
-            if (!isSqAttackedBySide([i, 4], colors[str]^1) &&
-                !isSqAttackedBySide([i, 5], colors[str]^1) &&
-                !isSqAttackedBySide([i, 6], colors[str]^1)) {
+            if (!isSqAttackedBySide([i, 4], colors[str] ^ 1) &&
+                !isSqAttackedBySide([i, 5], colors[str] ^ 1) &&
+                !isSqAttackedBySide([i, 6], colors[str] ^ 1)) {
                 addMove([i, 4], [i, 6], figs.empty,
-                    figs.empty, flag(false, false, str + 'KSide'));
+                    figs.empty, Flag(false, false, str + 'KSide'));
             }
         }
     }
@@ -134,11 +121,11 @@ const castle = side => {
         if (grid[i][1] === figs.empty &&
             grid[i][2] === figs.empty &&
             grid[i][3] === figs.empty) {
-            if (!isSqAttackedBySide([i, 2], colors[str]^1) &&
-                !isSqAttackedBySide([i, 3], colors[str]^1) &&
-                !isSqAttackedBySide([i, 4], colors[str]^1)) {
+            if (!isSqAttackedBySide([i, 2], colors[str] ^ 1) &&
+                !isSqAttackedBySide([i, 3], colors[str] ^ 1) &&
+                !isSqAttackedBySide([i, 4], colors[str] ^ 1)) {
                 addMove([i, 4], [i, 2], figs.empty,
-                    figs.empty, flag(false, false, str + 'QSide'));
+                    figs.empty, Flag(false, false, str + 'QSide'));
             }
         }
     }
@@ -208,4 +195,16 @@ const generateMoves = () => {
     }
     nonslide(startIndex1);
     slide(startIndex2);
+};
+
+const moveExists = move => {
+    generateMoves();
+    const start = gameBoard.moveListStart[gameBoard.ply];
+    const end = gameBoard.moveListStart[gameBoard.ply + 1];
+    for (let index = start; index < end; index++) {
+        const moveFound = gameBoard.moveList[index];
+        if (!isMoveLegal(moveFound)) continue;
+        if (checkObjectsEqual(move, moveFound)) return true;
+    }
+    return false;
 };

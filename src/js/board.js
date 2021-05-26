@@ -45,29 +45,26 @@ const updateListsMaterial = () => {
             }
         }
     }
-    // console.log(
-    //     'white score =', gameBoard.score[0], 'black score =', gameBoard.score[1]
-    // );
 };
 
 const genPosKey = () => {
-	let finalKey = 0;
-	let fig = figs.empty;
-	for (let i = 0; i < 8; i++){
-		for (let j = 0; j < 8; j++){
-			fig = grid[i][j];
-			if (fig !== figs.empty && fig !== figs.offBoard) {
-				finalKey ^= figKeys[(fig * 120) + ( 8 * i + j)];
-			}
-		}
-	}
-	if (gameBoard.side === colors.white) {
-		finalKey ^= sideKey;
-	}
-	if (gameBoard.enPas[0] !== -1 && gameBoard.enPas[1] !== -1) {
-		finalKey ^= figKeys[gameBoard.enPas];
-	}
-	finalKey ^= castleKeys[gameBoard.castlePerm];
-	return finalKey;
-}
+    let finalKey = 0;
+    let fig = figs.empty;
+    for (let i = 0; i < 8; i++) {
+        for (let j = 0; j < 8; j++) {
+            fig = grid[i][j];
+            if (fig !== figs.empty && fig !== figs.offBoard) {
+                finalKey ^= figKeys[(fig * 120) + (8 * i + j)];
+            }
+        }
+    }
+    if (gameBoard.side === colors.white) {
+        finalKey ^= sideKey;
+    }
+    if (gameBoard.enPas[0] !== -1 && gameBoard.enPas[1] !== -1) {
+        finalKey ^= figKeys[gameBoard.enPas];
+    }
+    finalKey ^= castleKeys[gameBoard.castlePerm];
+    return finalKey;
+};
 

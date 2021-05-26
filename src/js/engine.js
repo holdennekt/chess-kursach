@@ -18,7 +18,7 @@ const knBiRkKi = (sq, side, obj) => {
     }
     for (const dir of KnDir) {
         if (obj[i + dir[0]][j + dir[1]] === knight) {
-            // console.log(`attacked by ${revFigs[obj[i + dir[0]][j + dir[1]]]}`);
+            //console.log(`attackedBy${revFigs[obj[i + dir[0]][j + dir[1]]]}`);
             return true;
         }
     }
@@ -52,7 +52,7 @@ const knBiRkKi = (sq, side, obj) => {
     }
     for (const dir of KiDir) {
         if (obj[i + dir[0]][j + dir[1]] === king) {
-            // console.log(`attacked by ${revFigs[obj[i + dir[0]][j + dir[1]]]}`);
+            //console.log(`attackedBy${revFigs[obj[i + dir[0]][j + dir[1]]]}`);
             return true;
         }
     }

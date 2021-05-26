@@ -8,26 +8,19 @@ createBoard(block);
 
 window.onload = onLoad;
 
-
-function onLoad() {
-    init();
-    updateListsMaterial();
-    generateMoves();
-}
-
 const initBoardVars = () => {
-    for (const elem of gameBoard.history) {
+    for (let elem of gameBoard.history) {
         elem = {
             move: null,
             fiftyMove: 0,
             posKey: 0,
-        }
+        };
     }
-    for (const elem of gameBoard.pvTable) {
+    for (let elem of gameBoard.pvTable) {
         elem = {
             move: null,
             posKey: 0,
-        }
+        };
     }
 };
 
@@ -39,10 +32,15 @@ const initHashKeys = () => {
     for (let i = 0; i < 16; i++) {
         castleKeys[i] = rand32();
     }
-}
+};
 
 const init = () => {
+    initBoardVars();
     initHashKeys();
+};
+
+function onLoad() {
+    init();
+    updateListsMaterial();
+    generateMoves();
 }
-
-

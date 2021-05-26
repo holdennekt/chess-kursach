@@ -39,46 +39,103 @@ const moveFig = (from, to, obj = gameBoard, board = grid) => {
 
 const updateCastlePerm = (from, to, obj = gameBoard) => {
     if (from[0] === 0 && from[1] === 0) {
-        obj.castlePerm.blackQSide = false; 
+        obj.castlePerm.blackQSide = false;
     }
     if (from[0] === 0 && from[1] === 4) {
         obj.castlePerm.blackQSide = false;
         obj.castlePerm.blackKSide = false;
     }
     if (from[0] === 0 && from[1] === 7) {
-        obj.castlePerm.blackKSide = false; 
+        obj.castlePerm.blackKSide = false;
     }
     if (from[0] === 7 && from[1] === 0) {
-        obj.castlePerm.whiteQSide = false; 
+        obj.castlePerm.whiteQSide = false;
     }
     if (from[0] === 7 && from[1] === 4) {
         obj.castlePerm.whiteQSide = false;
-        obj.castlePerm.whiteKSide = false; 
+        obj.castlePerm.whiteKSide = false;
     }
     if (from[0] === 7 && from[1] === 7) {
-        obj.castlePerm.whiteKSide = false; 
+        obj.castlePerm.whiteKSide = false;
     }
     if (to[0] === 0 && to[1] === 0) {
-        obj.castlePerm.blackQSide = false; 
+        obj.castlePerm.blackQSide = false;
     }
     if (to[0] === 0 && to[1] === 4) {
         obj.castlePerm.blackQSide = false;
         obj.castlePerm.blackKSide = false;
     }
     if (to[0] === 0 && to[1] === 7) {
-        obj.castlePerm.blackKSide = false; 
+        obj.castlePerm.blackKSide = false;
     }
     if (to[0] === 7 && to[1] === 0) {
-        obj.castlePerm.whiteQSide = false; 
+        obj.castlePerm.whiteQSide = false;
     }
     if (to[0] === 7 && to[1] === 4) {
         obj.castlePerm.whiteQSide = false;
-        obj.castlePerm.whiteKSide = false; 
+        obj.castlePerm.whiteKSide = false;
     }
     if (to[0] === 7 && to[1] === 7) {
-        obj.castlePerm.whiteKSide = false; 
+        obj.castlePerm.whiteKSide = false;
     }
-}
+};
+
+const takeMove = () => {
+    gameBoard.hisPly--;
+    gameBoard.ply--;
+
+    const move = gameBoard.history[gameBoard.hisPly].move;
+
+    if (gameBoard.enPas[0] !== -1 &&
+        gameBoard.enPas[1] !== -1) hashEmpersant();
+    hashCastling();
+
+    gameBoard.castlePerm = gameBoard.history[gameBoard.hisPly].castlePerm;
+    gameBoard.fiftyMove = gameBoard.history[gameBoard.hisPly].fiftyMove;
+    gameBoard.enPas = gameBoard.history[gameBoard.hisPly].enPas;
+
+    if (gameBoard.enPas[0] !== -1 &&
+        gameBoard.enPas[1] !== -1) hashEmpersant();
+    hashCastling();
+
+    gameBoard.side ^= 1;
+    hashSide();
+
+    if (move.flag.enPas) {
+        if (gameBoard.side === colors.white) {
+            addFig([move.to[0] + 1, move.to[1]], figs.bP);
+        } else {
+            addFig([move.to[0] - 1, move.to[1]], figs.wP);
+        }
+    }
+    switch (move.flag.castling) {
+    case '': break;
+    case 'whiteKSide':
+        moveFig([7, 5], [7, 7]);
+        break;
+    case 'whiteQSide':
+        moveFig([7, 3], [7, 0]);
+        break;
+    case 'blackKSide':
+        moveFig([0, 5], [0, 7]);
+        break;
+    case 'blackQSide':
+        moveFig([0, 3], [0, 0]);
+        break;
+    }
+
+    moveFig(move.to, move.from);
+
+    if (move.captured !== figs.empty) {
+        addFig(move.to, move.captured);
+    }
+
+    if (move.promoted !== figs.empty) {
+        clearFig(move.from);
+        const statement = figCol[move.promoted] === colors.white;
+        addFig(move.from, (statement ? figs.wP : figs.bP));
+    }
+};
 
 const makeMove = move => {
     const side = gameBoard.side;
@@ -91,19 +148,19 @@ const makeMove = move => {
         }
     }
     switch (move.flag.castling) {
-        case '': break;
-        case 'whiteKSide':
-            moveFig([7, 7], [7, 5]);
-            break;
-        case 'whiteQSide':
-            moveFig([7, 0], [7, 3]);
-            break;
-        case 'blackKSide':
-            moveFig([0, 7], [0, 5]);
-            break;
-        case 'blackQSide':
-            moveFig([0, 0], [0, 3]);
-            break;
+    case '': break;
+    case 'whiteKSide':
+        moveFig([7, 7], [7, 5]);
+        break;
+    case 'whiteQSide':
+        moveFig([7, 0], [7, 3]);
+        break;
+    case 'blackKSide':
+        moveFig([0, 7], [0, 5]);
+        break;
+    case 'blackQSide':
+        moveFig([0, 0], [0, 3]);
+        break;
     }
     if (gameBoard.enPas[0] !== -1 &&
         gameBoard.enPas[1] !== -1) hashEmpersant();
@@ -115,7 +172,7 @@ const makeMove = move => {
     updateCastlePerm(move.from, move.to);
     gameBoard.enPas = [-1, -1];
     hashCastling();
-    gameBoard.fiftyMove++; 
+    gameBoard.fiftyMove++;
     if (move.captured !== 0) {
         clearFig(move.to);
         gameBoard.fiftyMove = 0;
@@ -153,67 +210,10 @@ const makeMove = move => {
     return true;
 };
 
-const takeMove = () => {
-    gameBoard.hisPly--;
-    gameBoard.ply--;
-
-    let move = gameBoard.history[gameBoard.hisPly].move;
-
-    if (gameBoard.enPas[0] !== -1 &&
-        gameBoard.enPas[1] !== -1) hashEmpersant();
-    hashCastling();
-
-    gameBoard.castlePerm = gameBoard.history[gameBoard.hisPly].castlePerm;
-    gameBoard.fiftyMove = gameBoard.history[gameBoard.hisPly].fiftyMove;
-    gameBoard.enPas = gameBoard.history[gameBoard.hisPly].enPas;
-
-    if (gameBoard.enPas[0] !== -1 &&
-        gameBoard.enPas[1] !== -1) hashEmpersant();
-    hashCastling();
-
-    gameBoard.side ^= 1;
-    hashSide();
-
-    if (move.flag.enPas) {
-        if (gameBoard.side === colors.white) {
-            addFig([move.to[0] + 1, move.to[1]], figs.bP);
-        } else {
-            addFig([move.to[0] - 1, move.to[1]], figs.wP);
-        }
-    } 
-    switch (move.flag.castling) {
-        case '': break;
-        case 'whiteKSide':
-            moveFig([7, 5], [7, 7]);
-            break;
-        case 'whiteQSide':
-            moveFig([7, 3], [7, 0]);
-            break;
-        case 'blackKSide':
-            moveFig([0, 5], [0, 7]);
-            break;
-        case 'blackQSide':
-            moveFig([0, 3], [0, 0]);
-            break;
-    }
-
-    moveFig(move.to, move.from);
-
-    if (move.captured !== figs.empty) {
-        addFig(move.to, move.captured);
-    }
-
-    if (move.promoted !== figs.empty) {
-        clearFig(move.from);
-        addFig(move.from, (figCol[move.promoted] === colors.white ? figs.wP : figs.bP));
-    }
-};
-
 const isMoveLegal = move => {
     const cloneGrid = cloneObj(grid);
     const cloneGameBoard = cloneObj(gameBoard);
     const side = cloneGameBoard.side;
-    let temp;
     if (move.flag.enPas) {
         if (side === colors.white) {
             clearFig([move.to[0] + 1, move.to[1]], cloneGameBoard, cloneGrid);
@@ -222,19 +222,19 @@ const isMoveLegal = move => {
         }
     }
     switch (move.flag.castling) {
-        case '': break;
-        case 'whiteKSide':
-            moveFig([7, 7], [7, 5], cloneGameBoard, cloneGrid);
-            break;
-        case 'whiteQSide':
-            moveFig([7, 0], [7, 3], cloneGameBoard, cloneGrid);
-            break;
-        case 'blackKSide':
-            moveFig([0, 7], [0, 5], cloneGameBoard, cloneGrid);
-            break;
-        case 'blackQSide':
-            moveFig([0, 0], [0, 3], cloneGameBoard, cloneGrid);
-            break;
+    case '': break;
+    case 'whiteKSide':
+        moveFig([7, 7], [7, 5], cloneGameBoard, cloneGrid);
+        break;
+    case 'whiteQSide':
+        moveFig([7, 0], [7, 3], cloneGameBoard, cloneGrid);
+        break;
+    case 'blackKSide':
+        moveFig([0, 7], [0, 5], cloneGameBoard, cloneGrid);
+        break;
+    case 'blackQSide':
+        moveFig([0, 0], [0, 3], cloneGameBoard, cloneGrid);
+        break;
     }
     updateCastlePerm(move.from, move.to, cloneGameBoard);
     if (move.captured !== 0) {
@@ -246,7 +246,7 @@ const isMoveLegal = move => {
         addFig(move.to, move.promoted, cloneGameBoard, cloneGrid);
     }
     cloneGameBoard.side ^= 1;
-    temp = cloneGameBoard.figList[figIndex(kings[side], 0)];
+    const temp = cloneGameBoard.figList[figIndex(kings[side], 0)];
     // console.log(temp);
     if (isSqAttackedBySide(temp, cloneGameBoard.side, cloneGrid)) {
         return false;
