@@ -58,6 +58,10 @@
     background-image: url('icons/dot.png');
 }
 
+.check {
+    background-color: rgb(119, 39, 39);
+}
+
 .suggestedCapture {
     background-image: url('icons/capture.png');
 }
