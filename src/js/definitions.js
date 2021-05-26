@@ -117,14 +117,18 @@ grid[7] = {
 };
 
 const logGrid = () => {
+    console.log('-----------GRID----------');
+    console.log('| 0  1  2  3  4  5  6  7');
     for (const i in grid) {
         if (i === '-2' || i === '-1' || i === '8' || i === '9') continue;
-        let row = grid[i];
+        const row = grid[i];
         console.log(
             i, revFigs[row[0]], revFigs[row[1]], revFigs[row[2]],
-            revFigs[row[3]], revFigs[row[4]], revFigs[row[5]], revFigs[row[6]], revFigs[row[7]]
+            revFigs[row[3]], revFigs[row[4]], revFigs[row[5]],
+            revFigs[row[6]], revFigs[row[7]]
         );
     }
+    console.log('-------------------------');
 };
 
 //logGrid();
@@ -147,7 +151,7 @@ const createSquares = block => {                //defining divs in container
 
 const clearSquares = block => {
     const figures = block.querySelectorAll('.figure');
-    if (figures.length === 0) return undefined;
+    if (figures.length === 0) return;
     for (const figure in figures) {
         block.removeChild(figure);
     }
@@ -157,8 +161,8 @@ const fillFigures = block => {
     clearSquares(block);
     for (let i = 0; i < 8; i++) {
         for (let j = 0; j < 8; j++) {
-            if (grid[i][j] >= 1 && grid[i][j] <= 12) {
-                let img = new Image();
+            if (grid[i][j] >= figs.wP && grid[i][j] <= figs.bK) {
+                const img = new Image();
                 img.src = `icons/${grid[i][j]}.png`;
                 img.className = `figure rank${i} file${j}`;
                 block.append(img);
@@ -186,7 +190,27 @@ const printer = () => {
 };
 
 const figIndex = (fig, figNum) => (fig * 10 + figNum);
+const notEmptyMove = (...args) => args.flat().every(el => el !== -1);
 
+const checkArrsEqual = (...arrs) => {
+    if (arrs.length === 1) return new Error('at least 2 arguments requied');
+    for (const arr of arrs) {
+        if (arr.length !== arrs[0].length) return false;
+    }
+    for (const i in arrs[0]) {
+        if (arrs.some(el => el[i] !== arrs[0][i])) return false;
+    }
+    return true;
+};
+const checkObjectsEqual = (a, b) => {
+    if (a.length !== b.length) return false;
+    for (const i in a) {
+        if (typeof a[i] === 'object') {
+            if(!checkObjectsEqual(a[i], b[i])) return false;
+        } else if (a[i] !== b[i]) return false;
+    }
+    return true;
+};
 const arr0 = n => {
     const res = [];
     for (let i = 0; i < n; i++) res.push(0);
@@ -195,10 +219,10 @@ const arr0 = n => {
 const arrOfObj = n => {
     const res = [];
     for (let i = 0; i < n; i++) {
-        res.push({move: {from: 0, to: 0}, posKey: 0});
+        res.push({ move: { from: 0, to: 0 }, posKey: 0 });
     }
     return res;
-}
+};
 const arr = n => new Array(n);
 const arrOfEmptyObjects = n => {
     const res = [];
@@ -206,32 +230,29 @@ const arrOfEmptyObjects = n => {
         res.push({});
     }
     return res;
-}
+};
 const cloneObj = obj => {
     const clone = {};
     for (const i in obj) {
         if (typeof obj[i] === 'object') {
             clone[i] =  cloneObj(obj[i]);
-        }
-        else clone[i] = obj[i];
+        } else clone[i] = obj[i];
     }
     return clone;
 };
 
 const emptyMove = () => ({ from: 0, to: 0 });
 const noMove = () => ({ from: [-1, -1], to: [-1, -1] });
-const rand32 = () => {
-    return (Math.floor((Math.random() * 225) + 1) << 23) |
+const rand32 = () => (Math.floor((Math.random() * 225) + 1) << 23) |
            (Math.floor((Math.random() * 225) + 1) << 16) |
            (Math.floor((Math.random() * 225) + 1) << 8) |
            Math.floor((Math.random() * 225) + 1);
-}
 const figKeys = new Array(14 * 120);
 let sideKey;
 const castleKeys = new Array(16);
-const hashFig = (fig, sq) => {gameBoard.posKey ^= figKeys[(fig * 120) + sq];};
+const hashFig = (fig, sq) => { gameBoard.posKey ^= figKeys[(fig * 120) + sq]; };
 const hashCastling = () => {
     gameBoard.posKey ^= castleKeys[gameBoard.castlePerm];
 };
-const hashSide = () => {gameBoard.posKey ^= sideKey;};
-const hashEmpersant = () => {gameBoard.posKey ^= figKeys[gameBoard.enPas];};
+const hashSide = () => { gameBoard.posKey ^= sideKey; };
+const hashEmpersant = () => { gameBoard.posKey ^= figKeys[gameBoard.enPas]; };
