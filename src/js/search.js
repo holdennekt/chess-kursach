@@ -45,18 +45,17 @@ const alphaBeta = (alpha, beta, depth) => {
 
     // get principle variation move
     // order pv move
-    
+
     let legal = 0;
     let oldAlpha = alpha, bestMove = emptyMove();
     const start = gameBoard.moveListStart[gameBoard.ply];
     const end = gameBoard.moveListStart[gameBoard.ply + 1];
-    for (let index = start; start < end; index++) {
+    for (let index = start; index < end; index++) {
         const move = gameBoard.moveList[index];
-        if (makeMove(move) == false) continue;
+        if (!isMoveLegal(move)) continue;
         legal++;
         score = -alphaBeta(-alpha, -beta, depth - 1);
-        takeMove();
-        if (search.stop == true) return 0;
+        if (search.stop === true) return 0;
         if (score > alpha) {
             if (score >= beta) {
                 if (legal === 1) {
@@ -104,11 +103,11 @@ const searchPosition = () => {
         bestScore = alphaBeta(-inf, inf, curDepth);
         if (search.stop === true) break;
     }
-    let bestMove = probePvTable();
-    let lineInfo = 
+    const bestMove = probePvTable();
+    let lineInfo =
         `depth: ${curDepth} best: ${bestMove.from} -> ${bestMove.to}
         score: ${bestScore} nodes: ${search.nodes}`;
-    let pvNum = getPvNum(curDepth);
+    const pvNum = getPvNum(curDepth);
     for (let i = 0; i < pvNum; i++) {
         lineInfo += ` ${gameBoard.pvArr[i].from} -> ${gameBoard.pvArr[i].to}`;
     }
