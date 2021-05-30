@@ -19,16 +19,76 @@ const checkTime = () => {
     if ((Date.now() - search.start) > search.time) search.stop = true;
 };
 
-const ifRepetition = () => {
+const isRepetition = () => {
 
 };
 
-const alphaBeta = (alpha, beta, depth) => {
+const quiescence = (alpha, beta) => {
+    if (search.nodes % 2048 === 0) checkTime();
     search.nodes++;
-    if (depth <= 0) {
+    const statement = (isRepetition() || gameBoard.fiftymove >= 100);
+    if (statement && gameBoard.ply !== 0) {
+        return 0;
+    }
+
+    if (gameBoard.ply > maxDepth - 1) {
         return evalPosition();
     }
+
+    let score = evalPosition();
+
+    if (score >= beta) {
+        return beta;
+    }
+
+    if (score > alpha) {
+        alpha = score;
+    }
+
+    generateMoves();
+
+    // get principle variation move
+    // order pv move
+
+    let legal = 0;
+    let oldAlpha = alpha, bestMove = emptyMove();
+    const start = gameBoard.moveListStart[gameBoard.ply];
+    const end = gameBoard.moveListStart[gameBoard.ply + 1];
+    for (let index = start; index < end; index++) {
+        const move = gameBoard.moveList[index];
+        if (!isMoveLegal(move) || move.captured === 0) continue;
+        legal++;
+        score = -quiescence(-alpha, -beta);
+        if (search.stop === true) return 0;
+        if (score > alpha) {
+            if (score >= beta) {
+                if (legal === 1) {
+                    search.failHighFirst++;
+                }
+                search.failHigh++;
+                // update killer moves
+                return beta;
+            }
+            alpha = score;
+            bestMove = move;
+            // update histoty table
+        }
+    }
+
+    if (alpha !== oldAlpha) {
+        storePvMove(bestMove);
+    }
+    return alpha;
+
+}
+
+const alphaBeta = (alpha, beta, depth) => {
+    if (depth <= 0) {
+        return quiescence(alpha, beta);
+    }
     if (search.nodes % 2048 === 0) checkTime();
+    search.nodes++;
+
 
     //check if repeats or fiftymove
 
