@@ -20,7 +20,13 @@ const checkTime = () => {
 };
 
 const isRepetition = () => {
-
+    let i = 0;
+    for (i = gameBoard.hisPly - gameBoard.fiftymove; i < gameBoard.hisPly - 1; i++) {
+        if (gameBoard.posKey === gameBoard.history[i].posKey) {
+            return true;
+        }
+    }
+    return false;
 };
 
 const quiescence = (alpha, beta) => {
@@ -90,7 +96,10 @@ const alphaBeta = (alpha, beta, depth) => {
     search.nodes++;
 
 
-    //check if repeats or fiftymove
+    const statement = (isRepetition() || gameBoard.fiftymove >= 100);
+    if (statement && gameBoard.ply !== 0) {
+        return 0;
+    }
 
     if (gameBoard.ply > maxDepth - 1) {
         return evalPosition();
