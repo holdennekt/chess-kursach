@@ -9,6 +9,32 @@ search.stop;
 search.best;
 search.thinking;
 
+const pickNextMove = (moveNum) => {
+
+    let bestScore = -1;
+    let bestNum = moveNum;
+
+    for (let i = moveNum; i < gameBoard.moveListStart[gameBoard.ply + 1]; i++) {
+        if (gameBoard.moveScores[i] > bestScore) {
+            bestScore = gameBoard.moveScores[i];
+            bestNum = i;
+        }
+    }
+
+    if (bestNum !== moveNum) {
+        let temp = 0;
+        temp = gameBoard.moveScores[moveNum];
+        gameBoard.moveScores[moveNum] = gameBoard.moveScores[bestNum];
+        gameBoard.moveScores[bestNum] = temp;
+
+        temp = gameBoard.moveList[moveNum];
+        gameBoard.moveList[moveNum] = gameBoard.moveList[bestNum];
+        gameBoard.moveList[bestNum] = temp;
+
+
+    }
+} 
+
 const clearPvTable = () => {
     for (const elem of gameBoard.pvTable) {
         elem.move = null;
@@ -20,8 +46,8 @@ const checkTime = () => {
 };
 
 const isRepetition = () => {
-    let i = 0;
-    for (i = gameBoard.hisPly - gameBoard.fiftymove; i < gameBoard.hisPly - 1; i++) {
+    const start = gameBoard.hisPly - gameBoard.fiftymove;
+    for (let i = start; i < gameBoard.hisPly - 1; i++) {
         if (gameBoard.posKey === gameBoard.history[i].posKey) {
             return true;
         }
@@ -60,8 +86,9 @@ const quiescence = (alpha, beta) => {
     let oldAlpha = alpha, bestMove = emptyMove();
     const start = gameBoard.moveListStart[gameBoard.ply];
     const end = gameBoard.moveListStart[gameBoard.ply + 1];
-    for (let index = start; index < end; index++) {
-        const move = gameBoard.moveList[index];
+    for (let i = start; i < end; i++) {
+        pickNextMove(i);
+        const move = gameBoard.moveList[i];
         if (!isMoveLegal(move) || move.captured === 0) continue;
         legal++;
         score = -quiescence(-alpha, -beta);
@@ -117,10 +144,24 @@ const alphaBeta = (alpha, beta, depth) => {
 
     let legal = 0;
     let oldAlpha = alpha, bestMove = emptyMove();
+    //obnovochka
+
     const start = gameBoard.moveListStart[gameBoard.ply];
     const end = gameBoard.moveListStart[gameBoard.ply + 1];
-    for (let index = start; index < end; index++) {
-        const move = gameBoard.moveList[index];
+
+    const pvMove = probePvTable();
+    if (checkObjectsEqual(pvMove, noMove())) {
+        for (let i = start; i < end; i++) {
+            if (gameBoard.moveList[moveNum] === pvMove) {
+                gameBoard.moveScores[moveNum] = 2000000; 
+                break;
+            }
+        }
+    }
+
+    for (let i = start; i < end; i++) {
+        pickNextMove(i);
+        const move = gameBoard.moveList[i];
         if (!isMoveLegal(move)) continue;
         legal++;
         score = -alphaBeta(-alpha, -beta, depth - 1);
@@ -131,8 +172,17 @@ const alphaBeta = (alpha, beta, depth) => {
                     search.failHighFirst++;
                 }
                 search.failHigh++;
-                // update killer moves
+                if (move.captured === 0) {
+                    gameBoard.searchKillers[maxDepth + gameBoard.ply] = 
+                        gameBoard.searchKillers[gameBoard.ply];
+                    gameBoard.searchKillers[gameBoard.ply] = move;
+                }
                 return beta;
+            }
+            if (move.captured === 0) {
+                //64 or 120
+                gameBoard.searchHistory[grid[from[0]][from[1]] * 64 + move.to] 
+                    += depth * depth;
             }
             alpha = score;
             bestMove = move;
@@ -179,6 +229,9 @@ const searchPosition = () => {
     const pvNum = getPvNum(curDepth);
     for (let i = 0; i < pvNum; i++) {
         lineInfo += ` ${gameBoard.pvArr[i].from} -> ${gameBoard.pvArr[i].to}`;
+    }
+    if (curDepth !== 1) {
+        lineInfo +=  ` Ordering: ${(search.failHighFirst / search.failHigh * 100).toFixed(2)}%`;
     }
     console.log(lineInfo);
     search.best = bestMove;

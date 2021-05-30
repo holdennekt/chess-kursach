@@ -1,10 +1,48 @@
-const Flag = (enPas = 0, pawnStart = false, castling = '') =>
+const mvvLvaValue = [
+    0, 100, 200, 300, 400, 500, 600,
+    100, 200, 300, 400, 500, 600
+];
+const mvvLvaScores = new Array(14 * 14);
+
+const initMvvLva = () => {
+    const magNum = 6;
+    for (let attacker = figs.wP; attacker <= figs.bK; attacker++) {
+        for (let victim = figs.wP; victim <= figs.bK; victim++) {
+            const i = victim * 14 + attacker;
+            const temp = mvvLvaValue[attacker] / 100;
+            mvvLvaScores[i] = mvvLvaValue[victim] + magNum - temp;
+        }
+    }
+}
+
+const Flag = (enPas = false, pawnStart = false, castling = '') =>
     ({ enPas, pawnStart, castling });
 
 const addMove = (from, to, captured = 0, promoted = 0, flag = Flag()) => {
     const move = { from, to, captured, promoted, flag };
     gameBoard.moveList[gameBoard.moveListStart[gameBoard.ply + 1]] = move;
-    gameBoard.moveScores[gameBoard.moveListStart[gameBoard.ply + 1]++] = 0;
+    if (captured !== 0) {
+        gameBoard.moveScores[gameBoard.moveListStart[gameBoard.ply + 1]++] =
+         mvvLvaScores[captured * 14 + grid[from[0]][from[1]]] + 1000000;
+    } else if (flag.enPas) {
+        gameBoard.moveScores[gameBoard.moveListStart[gameBoard.ply + 1]++] = 
+            105 + 1000000;
+    } else {
+        gameBoard.moveScores[gameBoard.moveListStart[gameBoard.ply + 1]] = 0;
+        if (move === gameBoard.searchKillers[gameBoard.ply + maxDepth]) {
+            gameBoard.moveScores[gameBoard.moveListStart[gameBoard.ply + 1]] =
+                900000;
+        } else if (move === gameBoard.searchKillers[gameBoard.ply]) {
+            gameBoard.moveScores[gameBoard.moveListStart[gameBoard.ply + 1]] =
+                800000;
+        } else {
+            gameBoard.moveScores[gameBoard.moveListStart[gameBoard.ply + 1]] =
+                gameBoard.searchHistory[grid[from[0]][from[1]] * 64 + move.to];
+        }
+        gameBoard.moveListStart[gameBoard.ply + 1]++;
+        // осторожно выше могут быть проблемы!!!?
+    }
+
 };
 
 const addWhitePawnMove = (from, to, captured = figs.empty) => {
@@ -131,7 +169,7 @@ const castle = side => {
     }
 };
 
-const nonslide = index => {
+const nonSlide = index => {
     for (let i = index; i < index + 2; i++) {
         const figg = noSlideFigs[i];
         for (let figNum = 0; figNum < gameBoard.figNum[figg]; figNum++) {
