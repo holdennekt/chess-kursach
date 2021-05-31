@@ -1,3 +1,5 @@
+'use strict';
+
 const mvvLvaValue = [
     0, 100, 200, 300, 400, 500, 600,
     100, 200, 300, 400, 500, 600
@@ -36,8 +38,9 @@ const addMove = (from, to, captured = 0, promoted = 0, flag = Flag()) => {
             gameBoard.moveScores[gameBoard.moveListStart[gameBoard.ply + 1]] =
                 800000;
         } else {
+            const temp = grid[from[0]][from[1]] * 120 + move.to[0] * 10;
             gameBoard.moveScores[gameBoard.moveListStart[gameBoard.ply + 1]] =
-                gameBoard.searchHistory[grid[from[0]][from[1]] * 64 + move.to];
+                gameBoard.searchHistory[temp + move.to[1] + 21];
         }
         gameBoard.moveListStart[gameBoard.ply + 1]++;
         // осторожно выше могут быть проблемы!!!?
