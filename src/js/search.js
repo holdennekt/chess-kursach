@@ -160,10 +160,8 @@ const alphaBeta = (alpha, beta, depth) => {
                 return beta;
             }
             if (move.captured === 0) {
-                //64 or 120
-                const temp = grid[from[0]][from[1]] * 120;
-                const i = temp + move.to[0] * 10 + move.to[1] + 21;
-                gameBoard.searchHistory[i] += depth * depth;
+                const index = grid[from[0]][from[1]] * 120 + sq120(move.to);
+                gameBoard.searchHistory[index] += depth * depth;
             }
             alpha = score;
             bestMove = move;
