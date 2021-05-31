@@ -1,3 +1,4 @@
+'use strict';
 const search = {};
 search.nodes;
 search.failHigh;
@@ -9,8 +10,7 @@ search.stop;
 search.best;
 search.thinking;
 
-const pickNextMove = (moveNum) => {
-
+const pickNextMove = moveNum => {
     let bestScore = -1;
     let bestNum = moveNum;
 
@@ -20,7 +20,6 @@ const pickNextMove = (moveNum) => {
             bestNum = i;
         }
     }
-
     if (bestNum !== moveNum) {
         let temp = 0;
         temp = gameBoard.moveScores[moveNum];
@@ -33,7 +32,7 @@ const pickNextMove = (moveNum) => {
 
 
     }
-} 
+};
 
 const clearPvTable = () => {
     for (const elem of gameBoard.pvTable) {
@@ -62,28 +61,20 @@ const quiescence = (alpha, beta) => {
     if (statement && gameBoard.ply !== 0) {
         return 0;
     }
-
     if (gameBoard.ply > maxDepth - 1) {
         return evalPosition();
     }
-
     let score = evalPosition();
-
     if (score >= beta) {
         return beta;
     }
-
     if (score > alpha) {
         alpha = score;
     }
-
     generateMoves();
 
-    // get principle variation move
-    // order pv move
-
-    let legal = 0;
-    let oldAlpha = alpha, bestMove = emptyMove();
+    let legal = 0, bestMove = emptyMove();
+    const oldAlpha = alpha;
     const start = gameBoard.moveListStart[gameBoard.ply];
     const end = gameBoard.moveListStart[gameBoard.ply + 1];
     for (let i = start; i < end; i++) {
@@ -99,12 +90,10 @@ const quiescence = (alpha, beta) => {
                     search.failHighFirst++;
                 }
                 search.failHigh++;
-                // update killer moves
                 return beta;
             }
             alpha = score;
             bestMove = move;
-            // update histoty table
         }
     }
 
@@ -113,7 +102,7 @@ const quiescence = (alpha, beta) => {
     }
     return alpha;
 
-}
+};
 
 const alphaBeta = (alpha, beta, depth) => {
     if (depth <= 0) {
@@ -127,7 +116,6 @@ const alphaBeta = (alpha, beta, depth) => {
     if (statement && gameBoard.ply !== 0) {
         return 0;
     }
-
     if (gameBoard.ply > maxDepth - 1) {
         return evalPosition();
     }
@@ -138,27 +126,19 @@ const alphaBeta = (alpha, beta, depth) => {
     if (inCheck) depth++;
     let score = -inf;
     generateMoves();
-
-    // get principle variation move
-    // order pv move
-
-    let legal = 0;
-    let oldAlpha = alpha, bestMove = emptyMove();
-    //obnovochka
-
+    let legal = 0, bestMove = emptyMove();
+    const oldAlpha = alpha;
     const start = gameBoard.moveListStart[gameBoard.ply];
     const end = gameBoard.moveListStart[gameBoard.ply + 1];
-
     const pvMove = probePvTable();
     if (checkObjectsEqual(pvMove, noMove())) {
         for (let i = start; i < end; i++) {
             if (gameBoard.moveList[moveNum] === pvMove) {
-                gameBoard.moveScores[moveNum] = 2000000; 
+                gameBoard.moveScores[moveNum] = 2000000;
                 break;
             }
         }
     }
-
     for (let i = start; i < end; i++) {
         pickNextMove(i);
         const move = gameBoard.moveList[i];
@@ -173,7 +153,7 @@ const alphaBeta = (alpha, beta, depth) => {
                 }
                 search.failHigh++;
                 if (move.captured === 0) {
-                    gameBoard.searchKillers[maxDepth + gameBoard.ply] = 
+                    gameBoard.searchKillers[maxDepth + gameBoard.ply] =
                         gameBoard.searchKillers[gameBoard.ply];
                     gameBoard.searchKillers[gameBoard.ply] = move;
                 }
@@ -181,12 +161,12 @@ const alphaBeta = (alpha, beta, depth) => {
             }
             if (move.captured === 0) {
                 //64 or 120
-                gameBoard.searchHistory[grid[from[0]][from[1]] * 64 + move.to] 
-                    += depth * depth;
+                const temp = grid[from[0]][from[1]] * 120;
+                const i = temp + move.to[0] * 10 + move.to[1] + 21;
+                gameBoard.searchHistory[i] += depth * depth;
             }
             alpha = score;
             bestMove = move;
-            // update histoty table
         }
     }
     if (legal === 0) {
@@ -231,7 +211,8 @@ const searchPosition = () => {
         lineInfo += ` ${gameBoard.pvArr[i].from} -> ${gameBoard.pvArr[i].to}`;
     }
     if (curDepth !== 1) {
-        lineInfo +=  ` Ordering: ${(search.failHighFirst / search.failHigh * 100).toFixed(2)}%`;
+        const temp = search.failHighFirst / search.failHigh * 100;
+        lineInfo +=  ` Ordering: ${temp.toFixed(2)}%`;
     }
     console.log(lineInfo);
     search.best = bestMove;
