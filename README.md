@@ -48,7 +48,6 @@ Chess implemented from scratch in js. In this game you can test your chess skill
 
 
 
-Participants: 
-    ## Participants:
+## Participants: 
 * Nikita Gryshak - https://github.com/holdennekt
 * Bohdan Pinchuk - https://github.com/BogPin
