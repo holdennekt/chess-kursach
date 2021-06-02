@@ -40,9 +40,11 @@ const suggestPromotion = async () => {
 };
 
 const newGame = () => {
+    const blockGameOver = document.querySelector('.gameOver');
+    document.querySelector('#parent').removeChild(blockGameOver);
     resetBoard();
-    updateListsMaterial();
     gameBoard.posKey = genPosKey();
+    updateListsMaterial();
     generateMoves();
 };
 
@@ -339,7 +341,7 @@ const preSearch = () => {
 
 const startSearch = () => {
     search.depth = maxDepth;
-    search.time = 1000;
+    search.time = 2500;
     searchPosition();
     makeMove(search.best);
     moveGuiFig(search.best);
