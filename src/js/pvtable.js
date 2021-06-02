@@ -1,28 +1,20 @@
+'use strict';
+
 const probePvTable = () => {
     const index = gameBoard.posKey % pvEntries;
     if (gameBoard.pvTable[index].posKey === gameBoard.posKey) {
+        // console.log('probing pvMove', gameBoard.pvTable[index].move);
         return gameBoard.pvTable[index].move;
     }
+    // console.log('probing pvMove', emptyMove());
     return emptyMove();
-};
-
-const findMove = move => {
-    const start = gameBoard.moveListStart[gameBoard.ply];
-    const end = gameBoard.moveListStart[gameBoard.ply + 1];
-    for (let index = start; index < end; index++) {
-        let moveFound = gameBoard.moveList[index];
-        if (!isMoveLegal(moveFound)) continue;
-        if (checkArrsEqual(moveFound.from, move.from) &&
-            checkArrsEqual(moveFound.to, move.to)) return moveFound;
-    }
-    return noMove();
 };
 
 const getPvNum = depth => {
     let move = probePvTable();
     let count = 0;
-    while (move.from !== 0 && move.to !== 0 && count < depth) {
-        if (!checkObjectsEqual(findMove(move), noMove())) {
+    while (!checkObjectsEqual(move, emptyMove()) && count < depth) {
+        if (moveExists(move)) {
             makeMove(move);
             gameBoard.pvArr[count++] = move;
         } else break;
@@ -35,6 +27,7 @@ const getPvNum = depth => {
 };
 
 const storePvMove = move => {
+    // console.log('storing pvMove', move);
     const index = gameBoard.posKey % pvEntries;
     gameBoard.pvTable[index].posKey = gameBoard.posKey;
     gameBoard.pvTable[index].move = move;

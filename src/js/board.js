@@ -1,3 +1,5 @@
+'use strict';
+
 const gameBoard = {
     'side': colors.white,
     'fiftyMove': 0,
@@ -9,39 +11,34 @@ const gameBoard = {
         blackKSide: true,
         blackQSide: true,
     },
-    'enPas': [-1, -1],
-    'history': arrOfEmptyObjects(maxGameMoves),
+    'enPas': noSq,
+    'history': arrHistory(maxGameMoves),
 };
-gameBoard.score = [0, 0];
-gameBoard.figList = arr0(130);
+gameBoard.material = [0, 0];
+gameBoard.figList = arr0(14 * 10);
 gameBoard.figNum = arr0(13);
-gameBoard.moveList = arr0(700);
-gameBoard.moveListStart = arr0(7);
+gameBoard.moveList = arr0(maxPositionMoves * maxDepth);
+gameBoard.moveListStart = arr0(maxDepth);
 gameBoard.moveScores = [];
-gameBoard.pvTable = arrOfObj(pvEntries);
+gameBoard.pvTable = arrPvTable(pvEntries);
 gameBoard.pvArr = arr0(maxDepth);
-gameBoard.searchHistory = arr0(14 * 64);
-gameBoard.searchKillers = arr0(3 * maxDepth);
+gameBoard.searchHistory = arr0(14 * 120);
+gameBoard.searchKillers = arrSearchKillers(3 * maxDepth);
 gameBoard.posKey = 0;
 
-const checkBoard = () => {
-    const tFigNum = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    const tScore = [0, 0];
-};
-
 const updateListsMaterial = () => {
-    gameBoard.score = [0, 0];
-    gameBoard.figList = arr0(130);
+    gameBoard.material = [0, 0];
+    gameBoard.figList = arr0(14 * 10);
     gameBoard.figNum = arr0(13);
-    for (let i = 0; i < 8; i++) {
-        for (let j = 0; j < 8; j++) {
-            const figg = grid[i][j];
-            if (figg !== figs.empty) {
-                const sq = [i, j];
-                const color = figCol[figg];
-                gameBoard.score[color] += figValue[figg];
-                gameBoard.figList[figIndex(figg, gameBoard.figNum[figg])] = sq;
-                gameBoard.figNum[figg]++;
+    for (let i = 0; i < size; i++) {
+        for (let j = 0; j < size; j++) {
+            let fig = grid[i][j];
+            if (fig !== figs.empty) {
+                let sq = [i, j];
+                let color = figCol[fig];
+                gameBoard.material[color] += figValue[fig];
+                gameBoard.figList[figIndex(fig, gameBoard.figNum[fig])] = sq;
+                gameBoard.figNum[fig]++;
             }
         }
     }
@@ -50,8 +47,8 @@ const updateListsMaterial = () => {
 const genPosKey = () => {
     let finalKey = 0;
     let fig = figs.empty;
-    for (let i = 0; i < 8; i++) {
-        for (let j = 0; j < 8; j++) {
+    for (let i = 0; i < size; i++) {
+        for (let j = 0; j < size; j++) {
             fig = grid[i][j];
             if (fig !== figs.empty && fig !== figs.offBoard) {
                 finalKey ^= figKeys[(fig * 120) + (8 * i + j)];
@@ -61,11 +58,78 @@ const genPosKey = () => {
     if (gameBoard.side === colors.white) {
         finalKey ^= sideKey;
     }
-    if (gameBoard.enPas[0] !== -1 && gameBoard.enPas[1] !== -1) {
-        finalKey ^= figKeys[gameBoard.enPas];
+    if (!checkArrsEqual(gameBoard.enPas, noSq)) {
+        console.log(transformEnPas(gameBoard.enPas));
+        finalKey ^= figKeys[transformEnPas(gameBoard.enPas)];
     }
-    finalKey ^= castleKeys[gameBoard.castlePerm];
+    finalKey ^= castleKeys[transformCastlePerm(gameBoard.castlePerm)];
     return finalKey;
+};
+
+const knBiRkKi = (sq, side, obj) => {
+    let knight, bishop, rook, queen, king;
+    const i = sq[0], j = sq[1];
+    if (side === colors.white) {
+        knight = figs.wN;
+        bishop = figs.wB;
+        rook = figs.wR;
+        queen = figs.wQ;
+        king = figs.wK;
+    } else {
+        knight = figs.bN;
+        bishop = figs.bB;
+        rook = figs.bR;
+        queen = figs.bQ;
+        king = figs.bK;
+    }
+    for (const dir of KnDir) {
+        if (obj[i + dir[0]][j + dir[1]] === knight) {
+            return true;
+        }
+    }
+    for (const dir of BiDir) {
+        let tempI = i + dir[0], tempJ = j + dir[1];
+        while (obj[tempI][tempJ] !== figs.offBoard) {
+            if (obj[tempI][tempJ] !== figs.empty) {
+                if (obj[tempI][tempJ] === bishop ||
+                    obj[tempI][tempJ] === queen) {
+                    return true;
+                }
+                break;
+            }
+            tempI += dir[0], tempJ += dir[1];
+        }
+    }
+    for (const dir of RkDir) {
+        let tempI = i + dir[0], tempJ = j + dir[1];
+        while (obj[tempI][tempJ] !== figs.offBoard) {
+            if (obj[tempI][tempJ] !== figs.empty) {
+                if (obj[tempI][tempJ] === rook ||
+                    obj[tempI][tempJ] === queen) {
+                    return true;
+                }
+                break;
+            }
+            tempI += dir[0], tempJ += dir[1];
+        }
+    }
+    for (const dir of KiDir) {
+        if (obj[i + dir[0]][j + dir[1]] === king) {
+            return true;
+        }
+    }
+    return false;
+};
+const isSqAttackedBySide = (sq, side, obj = grid) => {
+    const i = sq[0], j = sq[1];
+    if (side === colors.white) {
+        if (obj[i + 1][j - 1] === figs.wP || obj[i + 1][j + 1] === figs.wP) {
+            return true;
+        }
+    } else if (obj[i - 1][j - 1] === figs.bP || obj[i - 1][j + 1] === figs.bP) {
+        return true;
+    }
+    return knBiRkKi([i, j], side, obj);
 };
 
 const resetBoard = () => {
@@ -80,6 +144,8 @@ const resetBoard = () => {
         }
     }
     grid[0] = {
+        '-2': figs.offBoard,
+        '-1': figs.offBoard,
         0: figs.bR,
         1: figs.bN,
         2: figs.bB,
@@ -88,8 +154,12 @@ const resetBoard = () => {
         5: figs.bB,
         6: figs.bN,
         7: figs.bR,
-     }
+        8: figs.offBoard,
+        9: figs.offBoard,
+    };
     grid[1] = {
+        '-2': figs.offBoard,
+        '-1': figs.offBoard,
         0: figs.bP,
         1: figs.bP,
         2: figs.bP,
@@ -98,8 +168,12 @@ const resetBoard = () => {
         5: figs.bP,
         6: figs.bP,
         7: figs.bP,
-    }
+        8: figs.offBoard,
+        9: figs.offBoard,
+    };
     grid[6] = {
+        '-2': figs.offBoard,
+        '-1': figs.offBoard,
         0: figs.wP,
         1: figs.wP,
         2: figs.wP,
@@ -108,8 +182,12 @@ const resetBoard = () => {
         5: figs.wP,
         6: figs.wP,
         7: figs.wP,
-    }
+        8: figs.offBoard,
+        9: figs.offBoard,
+    };
     grid[7] = {
+        '-2': figs.offBoard,
+        '-1': figs.offBoard,
         0: figs.wR,
         1: figs.wN,
         2: figs.wB,
@@ -118,7 +196,9 @@ const resetBoard = () => {
         5: figs.wB,
         6: figs.wN,
         7: figs.wR,
-    }
+        8: figs.offBoard,
+        9: figs.offBoard,
+    };
     gameBoard.side = colors.white;
     gameBoard.enPas = [-1, -1];
     gameBoard.fiftyMove = 0;
@@ -132,5 +212,5 @@ const resetBoard = () => {
     };
     gameBoard.posKey = 0;
     gameBoard.moveListStart[gameBoard.ply] = 0;
-}
-
+    fillFigures(document.querySelector('#container'));
+};

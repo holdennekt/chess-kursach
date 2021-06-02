@@ -6,6 +6,8 @@ const figs = {
     bP: 7,    bN: 8,    bB: 9,    bR: 10,    bQ: 11,    bK: 12,
 };
 
+const size = 8, brdSqs = 120, noSq = [-1, -1];
+
 const revFigs = [
     '. ',
     'wP', 'wN', 'wB', 'wR', 'wQ', 'wK',
@@ -66,6 +68,12 @@ const mirrorTable = [
 
 const kings = [figs.wK, figs.bK];
 
+const gameController = {
+    engineSide: colors.both,
+    playerSide: colors.both,
+    gameOver: false,
+};
+
 const grid = {};
 for (let i = -2; i < 10; i++) {
     grid[i] = {};
@@ -83,7 +91,7 @@ for (let i = -2; i < 10; i++) {
     grid[i][8] = figs.offBoard;
     grid[i][9] = figs.offBoard;
 }
-for (let i = 0; i < 8; i++) {
+for (let i = 0; i < size; i++) {
     grid[1][i] = figs.bP;
     grid[6][i] = figs.wP;
 }
@@ -135,9 +143,9 @@ const logGrid = () => {
 
 const createSquares = block => {                //defining divs in container
     let light = 0;
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < size; i++) {
         light ^= 1;
-        for (let j = 0; j < 8; j++) {
+        for (let j = 0; j < size; j++) {
             const div = document.createElement('div');
             div.id = 'sq_' + i + j;
             div.className = `square rank${i} file${j}`;
@@ -159,8 +167,8 @@ const clearSquares = block => {
 
 const fillFigures = block => {
     clearSquares(block);
-    for (let i = 0; i < 8; i++) {
-        for (let j = 0; j < 8; j++) {
+    for (let i = 0; i < size; i++) {
+        for (let j = 0; j < size; j++) {
             if (grid[i][j] >= figs.wP && grid[i][j] <= figs.bK) {
                 const img = new Image();
                 img.src = `icons/${grid[i][j]}.png`;
@@ -191,6 +199,8 @@ const printer = () => {
 
 const figIndex = (fig, figNum) => (fig * 10 + figNum);
 const notEmptyMove = (...args) => args.flat().every(el => el !== -1);
+const sq120 = sq => (sq[0] * 10 + sq[1] + 21);
+const mirror = i => 7 - i;
 
 const checkArrsEqual = (...arrs) => {
     if (arrs.length === 1) return new Error('at least 2 arguments requied');
@@ -216,43 +226,74 @@ const arr0 = n => {
     for (let i = 0; i < n; i++) res.push(0);
     return res;
 };
-const arrOfObj = n => {
+const arrPvTable = n => {
     const res = [];
     for (let i = 0; i < n; i++) {
-        res.push({ move: { from: 0, to: 0 }, posKey: 0 });
+        res[i] = { move: emptyMove(), posKey: 0 };
     }
     return res;
 };
 const arr = n => new Array(n);
-const arrOfEmptyObjects = n => {
+const arrHistory = n => {
     const res = [];
     for (let i = 0; i < n; i++) {
-        res.push({});
+        res[i] = { 
+            move: emptyMove(),
+            fiftyMove: 0,
+            posKey: 0,
+            enPas: noSq,
+            castlePerm: {
+                whiteKSide: false,
+                whiteQSide: false,
+                blackKSide: false,
+                blackQSide: false,
+            },
+        };
     }
     return res;
 };
-const cloneObj = obj => {
-    const clone = {};
-    for (const i in obj) {
-        if (typeof obj[i] === 'object') {
-            clone[i] =  cloneObj(obj[i]);
-        } else clone[i] = obj[i];
+const arrSearchKillers = n => {
+    const res = [];
+    for (let i = 0; i < n; i++) {
+        res[i] = emptyMove();
     }
-    return clone;
+    return res;
+};
+const transformCastlePerm = obj => {
+    let res = 0;
+    if (obj.whiteKSide) res += 1;
+    if (obj.whiteQSide) res += 2;
+    if (obj.blackKSide) res += 4;
+    if (obj.blackQSide) res += 8;
+    return res;
+};
+const transformEnPas = arr => {
+    let res = 99;
+    if (notEmptyMove(arr)) res = arr[0] * 10 + arr[1] + 21;
+    return res;
 };
 
-const emptyMove = () => ({ from: 0, to: 0 });
-const noMove = () => ({ from: [-1, -1], to: [-1, -1] });
+const Flag = (enPas = false, pawnStart = false, castling = '') =>
+    ({ enPas, pawnStart, castling });
+const emptyMove = () => ({ 
+    from: noSq, to: noSq, captured: -1,
+    promoted: -1, flag: Flag(),
+});
+
 const rand32 = () => (Math.floor((Math.random() * 225) + 1) << 23) |
            (Math.floor((Math.random() * 225) + 1) << 16) |
            (Math.floor((Math.random() * 225) + 1) << 8) |
            Math.floor((Math.random() * 225) + 1);
-const figKeys = new Array(14 * 120);
+const figKeys = new Array(14 * brdSqs);
 let sideKey;
 const castleKeys = new Array(16);
-const hashFig = (fig, sq) => { gameBoard.posKey ^= figKeys[(fig * 120) + sq]; };
+const hashFig = (fig, sq) => { 
+    gameBoard.posKey ^= figKeys[(fig * brdSqs) + sq120(sq)];
+};
 const hashCastling = () => {
-    gameBoard.posKey ^= castleKeys[gameBoard.castlePerm];
+    gameBoard.posKey ^= castleKeys[transformCastlePerm(gameBoard.castlePerm)];
 };
 const hashSide = () => { gameBoard.posKey ^= sideKey; };
-const hashEmpersant = () => { gameBoard.posKey ^= figKeys[gameBoard.enPas]; };
+const hashEmpersant = () => {
+    gameBoard.posKey ^= figKeys[transformEnPas(gameBoard.enPas)];
+};
