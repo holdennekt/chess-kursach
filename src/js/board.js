@@ -68,3 +68,69 @@ const genPosKey = () => {
     return finalKey;
 };
 
+const resetBoard = () => {
+    for (let i = -2; i < 10; i++) {
+        for (let j = -2; j < 10; j++) {
+            if (i === -2 || i === -1 || i === 8 || i === 9 ||
+                j === -2 || j === -1 || j === 8 || j === 9) {
+                grid[i][j] = figs.offBoard;
+            } else {
+                grid[i][j] = figs.empty;
+            }
+        }
+    }
+    grid[0] = {
+        0: figs.bR,
+        1: figs.bN,
+        2: figs.bB,
+        3: figs.bQ,
+        4: figs.bK,
+        5: figs.bB,
+        6: figs.bN,
+        7: figs.bR,
+     }
+    grid[1] = {
+        0: figs.bP,
+        1: figs.bP,
+        2: figs.bP,
+        3: figs.bP,
+        4: figs.bP,
+        5: figs.bP,
+        6: figs.bP,
+        7: figs.bP,
+    }
+    grid[6] = {
+        0: figs.wP,
+        1: figs.wP,
+        2: figs.wP,
+        3: figs.wP,
+        4: figs.wP,
+        5: figs.wP,
+        6: figs.wP,
+        7: figs.wP,
+    }
+    grid[7] = {
+        0: figs.wR,
+        1: figs.wN,
+        2: figs.wB,
+        3: figs.wQ,
+        4: figs.wK,
+        5: figs.wB,
+        6: figs.wN,
+        7: figs.wR,
+    }
+    gameBoard.side = colors.white;
+    gameBoard.enPas = [-1, -1];
+    gameBoard.fiftyMove = 0;
+    gameBoard.ply = 0;
+    gameBoard.hisPly = 0;
+    gameBoard.castlePerm = {
+        whiteKSide: true,
+        whiteQSide: true,
+        blackKSide: true,
+        blackQSide: true,
+    };
+    gameBoard.posKey = 0;
+    gameBoard.moveListStart[gameBoard.ply] = 0;
+}
+
