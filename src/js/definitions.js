@@ -160,7 +160,7 @@ const createSquares = block => {                //defining divs in container
 const clearSquares = block => {
     const figures = block.querySelectorAll('.figure');
     if (figures.length === 0) return;
-    for (const figure in figures) {
+    for (const figure of figures) {
         block.removeChild(figure);
     }
 };
