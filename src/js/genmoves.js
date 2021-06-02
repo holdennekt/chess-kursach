@@ -235,10 +235,10 @@ const castle = side => {
 
 const noSlide = index => {
     for (let i = index; i < index + 2; i++) {
-        const figg = noSlideFigs[i];
-        for (let figNum = 0; figNum < gameBoard.figNum[figg]; figNum++) {
-            const sq = gameBoard.figList[figIndex(figg, figNum)];
-            const dirs = figDir[figg];
+        const fig = noSlideFigs[i];
+        for (let figNum = 0; figNum < gameBoard.figNum[fig]; figNum++) {
+            const sq = gameBoard.figList[figIndex(fig, figNum)];
+            const dirs = figDir[fig];
             for (const dir of dirs) {
                 const tempI = sq[0] + dir[0];
                 const tempJ = sq[1] + dir[1];
@@ -257,10 +257,10 @@ const noSlide = index => {
 
 const slide = index => {
     for (let i = index; i < index + 3; i++) {
-        const figg = slideFigs[i];
-        for (let figNum = 0; figNum < gameBoard.figNum[figg]; figNum++) {
-            const sq = gameBoard.figList[figIndex(figg, figNum)];
-            const dirs = figDir[figg];
+        const fig = slideFigs[i];
+        for (let figNum = 0; figNum < gameBoard.figNum[fig]; figNum++) {
+            const sq = gameBoard.figList[figIndex(fig, figNum)];
+            const dirs = figDir[fig];
             for (const dir of dirs) {
                 let tempI = sq[0] + dir[0];
                 let tempJ = sq[1] + dir[1];
@@ -361,10 +361,10 @@ const generateCaptures = () => {
         startIndex1 = 2, startIndex2 = 3;
     }
     for (let i = startIndex1; i < startIndex1 + 2; i++) {
-        const figg = noSlideFigs[i];
-        for (let figNum = 0; figNum < gameBoard.figNum[figg]; figNum++) {
-            const sq = gameBoard.figList[figIndex(figg, figNum)];
-            const dirs = figDir[figg];
+        const fig = noSlideFigs[i];
+        for (let figNum = 0; figNum < gameBoard.figNum[fig]; figNum++) {
+            const sq = gameBoard.figList[figIndex(fig, figNum)];
+            const dirs = figDir[fig];
             for (const dir of dirs) {
                 const tempI = sq[0] + dir[0];
                 const tempJ = sq[1] + dir[1];
@@ -378,10 +378,10 @@ const generateCaptures = () => {
         }
     }
     for (let i = startIndex2; i < startIndex2 + 3; i++) {
-        const figg = slideFigs[i];
-        for (let figNum = 0; figNum < gameBoard.figNum[figg]; figNum++) {
-            const sq = gameBoard.figList[figIndex(figg, figNum)];
-            const dirs = figDir[figg];
+        const fig = slideFigs[i];
+        for (let figNum = 0; figNum < gameBoard.figNum[fig]; figNum++) {
+            const sq = gameBoard.figList[figIndex(fig, figNum)];
+            const dirs = figDir[fig];
             for (const dir of dirs) {
                 let tempI = sq[0] + dir[0];
                 let tempJ = sq[1] + dir[1];
