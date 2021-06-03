@@ -4,6 +4,7 @@
   "description": "Participants: Nikita Gryshchak, Pinchuk Bohdan",
   "main": "script.js",
   "scripts": {
+    "lint:fix": "npm run lint -- --fix",
     "test": "t"
   },
   "repository": {

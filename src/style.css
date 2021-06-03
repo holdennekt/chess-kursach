@@ -101,9 +101,8 @@
 }
 
 .gameOver {
-    width: 500px;
-    height: 250px;
-    border-radius: 20px;
+    width: 400px;
+    height: 200px;
     border: 3px solid black;
     position: absolute;
     left: 0;
@@ -111,6 +110,21 @@
     top: 0;
     bottom: 0;
     margin: auto;
-    padding: auto;
-    background-color: rgb(251, 194, 132);
+    background-color: rgb(255, 200, 140);
+}
+
+.gameStatus {
+    display: inline;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    font: 2em "Fira Sans", sans-serif;
+}
+
+.btnNewGame {
+    background-color: darkblue;
+    color: darkgray;
 }
