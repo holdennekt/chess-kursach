@@ -93,6 +93,17 @@ const quiescence = (alpha, beta) => {
   return alpha;
 };
 
+const searchPvMove = pvMove => {
+  const start = gameBoard.moveListStart[gameBoard.ply];
+  const end = gameBoard.moveListStart[gameBoard.ply + 1];
+  if (!checkObjectsEqual(pvMove, emptyMove())) {
+    for (let i = start; i < end; i++) {
+      if (checkObjectsEqual(gameBoard.moveList[i], pvMove)) return i;
+    }
+  }
+  return -1;
+};
+
 const alphaBeta = (alpha, beta, depth) => {
   if (depth <= 0) {
     return quiescence(alpha, beta);
@@ -116,18 +127,10 @@ const alphaBeta = (alpha, beta, depth) => {
   let legal = 0, bestMove = emptyMove();
   const oldAlpha = alpha;
   const pvMove = probePvTable();
-  let start = gameBoard.moveListStart[gameBoard.ply];
-  let end = gameBoard.moveListStart[gameBoard.ply + 1];
-  if (!checkObjectsEqual(pvMove, emptyMove())) {
-    for (let i = start; i < end; i++) {
-      if (checkObjectsEqual(gameBoard.moveList[i], pvMove)) {
-        gameBoard.moveScores[i] = 2000000;
-        break;
-      }
-    }
-  }
-  start = gameBoard.moveListStart[gameBoard.ply];
-  end = gameBoard.moveListStart[gameBoard.ply + 1];
+  const index = searchPvMove(pvMove);
+  if (index !== -1) gameBoard.moveScores[index] = pvBonus;
+  const start = gameBoard.moveListStart[gameBoard.ply];
+  const end = gameBoard.moveListStart[gameBoard.ply + 1];
   for (let i = start; i < end; i++) {
     pickNextMove(i);
     const move = gameBoard.moveList[i];
@@ -138,20 +141,18 @@ const alphaBeta = (alpha, beta, depth) => {
     if (search.stop) return 0;
     if (score > alpha) {
       if (score >= beta) {
-        if (legal === 1) {
-          search.failHighFirst++;
-        }
+        if (legal === 1) search.failHighFirst++;
         search.failHigh++;
         if (move.captured === 0) {
           gameBoard.searchKillers[maxDepth + gameBoard.ply] =
-                        gameBoard.searchKillers[gameBoard.ply];
+            gameBoard.searchKillers[gameBoard.ply];
           gameBoard.searchKillers[gameBoard.ply] = move;
         }
         return beta;
       }
       if (move.captured === 0) {
         const from = move.from, to = move.to;
-        const index = grid[from[0]][from[1]] * 120 + sq120(mirror(to));
+        const index = grid[from[0]][from[1]] * gridSqNum + sq120(mirror(to));
         gameBoard.searchHistory[index] += depth * depth;
       }
       alpha = score;
@@ -169,7 +170,7 @@ const alphaBeta = (alpha, beta, depth) => {
 };
 
 const clearForSearch = () => {
-  gameBoard.searchHistory = arr0(14 * 120);
+  gameBoard.searchHistory = arr0((typesOfFigures + 1) * gridSqNum);
   gameBoard.searchKillers = arrSearchKillers(3 * maxDepth);
   gameBoard.pvTable = arrPvTable(pvEntries);
   gameBoard.ply = 0;
@@ -188,8 +189,8 @@ const searchPosition = () => {
     if (search.stop) break;
     bestMove = probePvTable();
     let lineInfo =
-            `depth: ${curDepth} best: ${bestMove.from} -> ${bestMove.to} ` +
-            `score: ${bestScore} nodes: ${search.nodes}`;
+      `depth: ${curDepth} best: ${bestMove.from} -> ${bestMove.to} ` +
+      `score: ${bestScore} nodes: ${search.nodes}`;
     const pvNum = getPvNum(curDepth);
     for (let i = 0; i < pvNum; i++) {
       lineInfo += ` ${gameBoard.pvArr[i].from} -> ${gameBoard.pvArr[i].to}`;

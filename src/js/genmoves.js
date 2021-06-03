@@ -5,8 +5,11 @@ const mvvLvaValue = [
   100, 200, 300, 400, 500, 600
 ];
 
+const captureBonus = 1000000, enPasBonus = 1000105;
+const killerBonus = 900000, killerBonus2 = 800000, pvBonus = 2000000;
+
 const initMvvLva = () => {
-  const res = arr(14 * 14);
+  const res = [];
   const magNum = 6;
   for (let attacker = figs.wP; attacker <= figs.bK; attacker++) {
     for (let victim = figs.wP; victim <= figs.bK; victim++) {
@@ -22,30 +25,27 @@ const mvvLvaScores = initMvvLva();
 
 const addMove = (from, to, captured = 0, promoted = 0, flag = Flag()) => {
   const move = { from, to, captured, promoted, flag };
-  gameBoard.moveList[gameBoard.moveListStart[gameBoard.ply + 1]] = move;
+  const index = gameBoard.moveListStart[gameBoard.ply + 1];
+  gameBoard.moveList[index] = move;
   if (captured !== 0) {
-    gameBoard.moveScores[gameBoard.moveListStart[gameBoard.ply + 1]++] =
-            mvvLvaScores[captured * 14 + grid[from[0]][from[1]]] + 1000000;
+    const scoresIndex = captured * 14 + grid[from[0]][from[1]];
+    gameBoard.moveScores[index] = mvvLvaScores[scoresIndex] + captureBonus;
   } else if (flag.enPas) {
-    gameBoard.moveScores[gameBoard.moveListStart[gameBoard.ply + 1]++] =
-            105 + 1000000;
+    gameBoard.moveScores[index] = enPasBonus;
   } else {
-    gameBoard.moveScores[gameBoard.moveListStart[gameBoard.ply + 1]] = 0;
+    gameBoard.moveScores[index] = 0;
     const moveKiller1 = gameBoard.searchKillers[gameBoard.ply];
     const moveKiller2 = gameBoard.searchKillers[gameBoard.ply + maxDepth];
     if (checkObjectsEqual(move, moveKiller1)) {
-      gameBoard.moveScores[gameBoard.moveListStart[gameBoard.ply + 1]] =
-                900000;
+      gameBoard.moveScores[index] = killerBonus;
     } else if (checkObjectsEqual(move, moveKiller2)) {
-      gameBoard.moveScores[gameBoard.moveListStart[gameBoard.ply + 1]] =
-                800000;
+      gameBoard.moveScores[index] = killerBonus2;
     } else {
-      const temp = grid[from[0]][from[1]] * 120 + sq120(mirror(to));
-      gameBoard.moveScores[gameBoard.moveListStart[gameBoard.ply + 1]] =
-                gameBoard.searchHistory[temp];
+      const temp = grid[from[0]][from[1]] * gridSqNum + sq120(mirror(to));
+      gameBoard.moveScores[index] = gameBoard.searchHistory[temp];
     }
-    gameBoard.moveListStart[gameBoard.ply + 1]++;
   }
+  gameBoard.moveListStart[gameBoard.ply + 1]++;
 };
 
 const addWhitePawnMove = (from, to, captured = figs.empty) => {
@@ -82,23 +82,21 @@ const whitePawns = () => {
       }
     }
     if (grid[sq[0] - 1][sq[1] - 1] > figs.empty &&
-            figCol[grid[sq[0] - 1][sq[1] - 1]] === colors.black) {
+        figCol[grid[sq[0] - 1][sq[1] - 1]] === colors.black) {
       addWhitePawnMove(sq, [sq[0] - 1, sq[1] - 1],
         grid[sq[0] - 1][sq[1] - 1]);
     }
     if (grid[sq[0] - 1][sq[1] + 1] > figs.empty &&
-            figCol[grid[sq[0] - 1][sq[1] + 1]] === colors.black) {
+        figCol[grid[sq[0] - 1][sq[1] + 1]] === colors.black) {
       addWhitePawnMove(sq, [sq[0] - 1, sq[1] + 1],
         grid[sq[0] - 1][sq[1] + 1]);
     }
-    if (!checkArrsEqual(gameBoard.enPas, noSq)) {
-      if (sq[0] - 1 === gameBoard.enPas[0] &&
-                sq[1] - 1 === gameBoard.enPas[1]) {
+    if (!arrsEqual(gameBoard.enPas, noSq())) {
+      if (arrsEqual(gameBoard.enPas, [sq[0] - 1, sq[1] - 1])) {
         addMove(sq, [sq[0] - 1, sq[1] - 1],
           figs.empty, figs.empty, Flag(true));
       }
-      if (sq[0] - 1 === gameBoard.enPas[0] &&
-                sq[1] + 1 === gameBoard.enPas[1]) {
+      if (arrsEqual(gameBoard.enPas, [sq[0] - 1, sq[1] + 1])) {
         addMove(sq, [sq[0] - 1, sq[1] + 1],
           figs.empty, figs.empty, Flag(true));
       }
@@ -118,23 +116,21 @@ const blackPawns = () => {
       }
     }
     if (grid[sq[0] + 1][sq[1] - 1] > figs.empty &&
-            figCol[grid[sq[0] + 1][sq[1] - 1]] === colors.white) {
+        figCol[grid[sq[0] + 1][sq[1] - 1]] === colors.white) {
       addBlackPawnMove(sq, [sq[0] + 1, sq[1] - 1],
         grid[sq[0] + 1][sq[1] - 1]);
     }
     if (grid[sq[0] + 1][sq[1] + 1] > figs.empty &&
-            figCol[grid[sq[0] + 1][sq[1] + 1]] === colors.white) {
+        figCol[grid[sq[0] + 1][sq[1] + 1]] === colors.white) {
       addBlackPawnMove(sq, [sq[0] + 1, sq[1] + 1],
         grid[sq[0] + 1][sq[1] + 1]);
     }
-    if (gameBoard.enPas[0] !== -1) {
-      if (sq[0] + 1 === gameBoard.enPas[0] &&
-                sq[1] - 1 === gameBoard.enPas[1]) {
+    if (!arrsEqual(gameBoard.enPas, noSq())) {
+      if (arrsEqual(gameBoard.enPas, [sq[0] + 1, sq[1] - 1])) {
         addMove(sq, [sq[0] + 1, sq[1] - 1], figs.empty,
           figs.empty, Flag(true));
       }
-      if (sq[0] + 1 === gameBoard.enPas[0] &&
-                sq[1] + 1 === gameBoard.enPas[1]) {
+      if (arrsEqual(gameBoard.enPas, [sq[0] + 1, sq[1] + 1])) {
         addMove(sq, [sq[0] + 1, sq[1] + 1], figs.empty,
           figs.empty, Flag(true));
       }
@@ -143,28 +139,28 @@ const blackPawns = () => {
 };
 
 const castle = side => {
-  let i, str;
-  if (side === colors.white) i = 7, str = 'white';
-  else i = 0, str = 'black';
-  if (gameBoard.castlePerm[str + 'KSide']) {
+  let i, color;
+  if (side === colors.white) i = 7, color = 'white';
+  else i = 0, color = 'black';
+  if (gameBoard.castlePerm[color + 'KSide']) {
     if (grid[i][5] === figs.empty && grid[i][6] === figs.empty) {
-      if (!isSqAttackedBySide([i, 4], colors[str] ^ 1) &&
-                !isSqAttackedBySide([i, 5], colors[str] ^ 1) &&
-                !isSqAttackedBySide([i, 6], colors[str] ^ 1)) {
-        addMove([i, 4], [i, 6], figs.empty,
-          figs.empty, Flag(false, false, str + 'KSide'));
+      if (!isSqAttackedBySide([i, 4], colors[color] ^ 1) &&
+          !isSqAttackedBySide([i, 5], colors[color] ^ 1) &&
+          !isSqAttackedBySide([i, 6], colors[color] ^ 1)) {
+        addMove([i, 4], [i, 6], figs.empty, figs.empty,
+          Flag(false, false, color + 'KSide'));
       }
     }
   }
-  if (gameBoard.castlePerm[str + 'QSide']) {
+  if (gameBoard.castlePerm[color + 'QSide']) {
     if (grid[i][1] === figs.empty &&
-            grid[i][2] === figs.empty &&
-            grid[i][3] === figs.empty) {
-      if (!isSqAttackedBySide([i, 2], colors[str] ^ 1) &&
-                !isSqAttackedBySide([i, 3], colors[str] ^ 1) &&
-                !isSqAttackedBySide([i, 4], colors[str] ^ 1)) {
-        addMove([i, 4], [i, 2], figs.empty,
-          figs.empty, Flag(false, false, str + 'QSide'));
+      grid[i][2] === figs.empty &&
+      grid[i][3] === figs.empty) {
+      if (!isSqAttackedBySide([i, 2], colors[color] ^ 1) &&
+          !isSqAttackedBySide([i, 3], colors[color] ^ 1) &&
+          !isSqAttackedBySide([i, 4], colors[color] ^ 1)) {
+        addMove([i, 4], [i, 2], figs.empty, figs.empty,
+          Flag(false, false, color + 'QSide'));
       }
     }
   }
@@ -201,11 +197,10 @@ const slide = index => {
       for (const dir of dirs) {
         let tempI = sq[0] + dir[0];
         let tempJ = sq[1] + dir[1];
-        while (grid[tempI][tempJ] !== -1) {
-          if (grid[tempI][tempJ] !== 0) {
+        while (grid[tempI][tempJ] !== figs.offBoard) {
+          if (grid[tempI][tempJ] !== figs.empty) {
             if (figCol[grid[tempI][tempJ]] !== gameBoard.side) {
-              addMove(sq, [tempI, tempJ],
-                grid[tempI][tempJ]);
+              addMove(sq, [tempI, tempJ], grid[tempI][tempJ]);
             }
             break;
           }
@@ -220,7 +215,7 @@ const slide = index => {
 
 const generateMoves = () => {
   gameBoard.moveListStart[gameBoard.ply + 1] =
-        gameBoard.moveListStart[gameBoard.ply];
+    gameBoard.moveListStart[gameBoard.ply];
   let startIndex1, startIndex2;
   if (gameBoard.side === colors.white) {
     whitePawns();
@@ -241,10 +236,9 @@ const moveExists = move => {
   const end = gameBoard.moveListStart[gameBoard.ply + 1];
   for (let index = start; index < end; index++) {
     const moveFound = gameBoard.moveList[index];
-    if (!makeMove(moveFound)) {
+    if (!isMoveLegal(moveFound)) {
       continue;
     }
-    takeMove();
     if (checkObjectsEqual(move, moveFound)) {
       return true;
     }

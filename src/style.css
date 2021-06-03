@@ -1,25 +1,25 @@
 #parent {
-    position: relative;
+  position: relative;
 }
 
 #container {
-    position: relative;
-    width: 800px;
-    height: 800px;
-    border: 3px solid grey;
-    margin: auto;
+  position: relative;
+  width: 800px;
+  height: 800px;
+  border: 3px solid grey;
+  margin: auto;
 }
 .square {
-    position: absolute;
-    width:100px;
-    height:100px;
+  position: absolute;
+  width:100px;
+  height:100px;
 }
 
 .figure {
-    position: absolute;
-    width: 100px;
-    height: 100px;
-    animation: 1s ease-in-out 0.3;
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  animation: 1s ease-in-out 0.3;
 }
 
 .rank0 { top: 0%; }
@@ -41,90 +41,97 @@
 .file7 { left: 87.5%; }
 
 .light {
-    background-color: rgb(255, 212, 155);
+  background-color: rgb(255, 212, 155);
 }
 
 .dark {
-    background-color: rgb(240, 166, 97);
+  background-color: rgb(240, 166, 97);
 }
 
 .selected {
-    background-color: rgb(175, 137, 93);
+  background-color: rgb(175, 137, 93);
 }
 
 .suggested {
-    background-image: url('icons/dot.png');
+  background-image: url('icons/dot.png');
 }
 
 .check {
-    background-image: url('icons/check.png');
+  background-image: url('icons/check.png');
 }
 
 .suggestedCaptureLeft {
-    background-image: url('icons/captureLeft.png');
+  background-image: url('icons/captureLeft.png');
 }
 
 .suggestedCaptureRight {
-    background-image: url('icons/captureRight.png');
+  background-image: url('icons/captureRight.png');
 }
 
 .promotion {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    margin: auto;
-    padding: auto;
-    width: 500px;
-    height: 200px;
-    border: 3px solid black;
-    background-color: rgb(251, 194, 132);
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  padding: auto;
+  width: 500px;
+  height: 200px;
+  border: 3px solid black;
+  background-color: rgb(251, 194, 132);
 }
 
 .imagesHandler {
-    position: absolute;
-    border: 3px solid black;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    margin: auto;
-    width: 408px;
-    height: 102px;
-    background-color: rgb(248, 177, 110); 
+  position: absolute;
+  border: 3px solid black;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  width: 408px;
+  height: 102px;
+  background-color: rgb(248, 177, 110); 
 }
 
 .suggestion {
-    display: inline-block;
-    border: 1px solid black;
+  display: inline-block;
+  border: 1px solid black;
 }
 
 .gameOver {
-    width: 400px;
-    height: 200px;
-    border: 3px solid black;
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    margin: auto;
-    background-color: rgb(255, 200, 140);
+  width: 400px;
+  height: 200px;
+  border: 3px solid black;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+  background-color: rgb(255, 200, 140);
 }
 
 .gameStatus {
-    display: inline;
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    margin: auto;
-    font: 2em "Fira Sans", sans-serif;
+  /* display: inline;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto; */
+  font: 2em "Fira Sans", sans-serif;
 }
 
 .btnNewGame {
-    background-color: darkblue;
-    color: darkgray;
+  position: absolute;
+  left: 0;
+  right: 0;
+	margin-left: auto;
+	margin-right: auto;
+	top: 435px;
 }
