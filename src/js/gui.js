@@ -39,30 +39,28 @@ const suggestPromotion = async () => {
 
 const newGame = () => {
   const blockGameOver = document.querySelector('.gameOver');
+  const btnNewGame = document.querySelector('.btnNewGame');
   document.querySelector('#parent').removeChild(blockGameOver);
+  document.querySelector('#parent').removeChild(btnNewGame);
   resetBoard();
   gameBoard.posKey = genPosKey();
-  updateListsMaterial();
+  updateMaterialAndFigList();
   generateMoves();
 };
 
 const gameOver = str => {
   const block = document.createElement('div');
-  // const textBlock = document.createElement('div');
   const text = document.createElement('p');
   const btn = document.createElement('button');
   block.className = 'gameOver';
-  // textBlock.className = 'textBlock';
   text.className = 'gameStatus';
   text.innerHTML = str;
   btn.className = 'btnNewGame';
   btn.innerHTML = 'New game';
   btn.onclick = newGame;
   document.querySelector('#parent').appendChild(block);
-  // block.appendChild(textBlock);
-  // textBlock.appendChild(text);
   block.appendChild(text);
-  block.appendChild(btn);
+  document.querySelector('#parent').appendChild(btn);
 };
 
 const parseMove = async (from, to) => {
@@ -72,8 +70,7 @@ const parseMove = async (from, to) => {
   let found = false, move;
   for (let index = start; index < end; index++) {
     move = gameBoard.moveList[index];
-    if (checkArrsEqual(move.from, from) &&
-            checkArrsEqual(move.to, to)) {
+    if (arrsEqual(move.from, from) && arrsEqual(move.to, to)) {
       if (move.promoted !== 0) {
         const promotion = await suggestPromotion();
         move.promoted = promotion;
@@ -85,8 +82,7 @@ const parseMove = async (from, to) => {
     }
   }
   if (found) {
-    if (!makeMove(move)) return emptyMove();
-    takeMove();
+    if (!isMoveLegal(move)) return emptyMove();
     return move;
   }
   return emptyMove();
@@ -139,7 +135,6 @@ const toggleCheckKing = (mode = '', side) => {
 
 const removeGuiFig = sq => {
   const str = `.figure.rank${sq[0]}.file${sq[1]}`;
-  console.log(str);
   const figOnSq = document.querySelectorAll(str)[0];
   document.querySelector('#container').removeChild(figOnSq);
 };
@@ -185,7 +180,7 @@ const moveGuiFig = move => {
     addGuiFig([0, 3], figs.bR);
     break;
   }
-  if (move.promoted  !== figs.empty) {
+  if (move.promoted !== figs.empty) {
     removeGuiFig(move.to);
     addGuiFig(move.to, move.promoted);
   }
@@ -198,7 +193,7 @@ const suggestMoves = from => {
   const suggest = [];
   for (let index = start; index < end; index++) {
     const move = gameBoard.moveList[index];
-    if (checkArrsEqual(from, move.from) && isMoveLegal(move)) {
+    if (arrsEqual(from, move.from) && isMoveLegal(move)) {
       suggest.push(move);
     }
   }
@@ -218,8 +213,8 @@ const makeUserMove = async () => {
       preSearch();
     }
     deselectSquares();
-    userMove.from = [-1, -1];
-    userMove.to = [-1, -1];
+    userMove.from = noSq();
+    userMove.to = noSq();
   }
 };
 
@@ -232,13 +227,12 @@ const clickedOnSquare = (i, j) => {
 
 const clickedOnFigure = (i, j) => {
   selectSquares(i, j);
-  if (userMove.from[0] === -1 && userMove.from[1] === -1 &&
-        figCol[grid[i][j]] === gameBoard.side) {
+  if (arrsEqual(userMove.from, [-1, -1]) &&
+      figCol[grid[i][j]] === gameBoard.side) {
     userMove.from[0] = i, userMove.from[1] = j;
-  } else if (userMove.from[0] === -1 && userMove.from[1] === -1 &&
-                figCol[grid[i][j]] !== gameBoard.side) {
-    return;
-  } else {
+  } else if (arrsEqual(userMove.from, [-1, -1]) &&
+            figCol[grid[i][j]] !== gameBoard.side) return;
+  else {
     const figFrom = grid[userMove.from[0]][userMove.from[1]];
     if (figCol[grid[i][j]] === figCol[figFrom]) {
       userMove.from[0] = i, userMove.from[1] = j;
@@ -248,22 +242,20 @@ const clickedOnFigure = (i, j) => {
 };
 
 const clicked = click => {
-  const x = click.pageX - click.path[1].getBoundingClientRect().left;
-  const y = click.pageY - click.path[1].getBoundingClientRect().top;
-  const i = Math.floor(y / 100);
-  const j = Math.floor(x / 100);
   const targetClass = click.target.className;
+  const i = parseInt(targetClass[11]);
+  const j = parseInt(targetClass[17]);
   if (targetClass.includes('square')) clickedOnSquare(i, j);
   else if (targetClass.includes('figure')) clickedOnFigure(i, j);
 };
 
-const isDraw = () => {
+const isEnoughFigures = () => {
   if (gameBoard.figNum[figs.wP] !== 0 || gameBoard.figNum[figs.bP] !== 0 ||
-	gameBoard.figNum[figs.wQ] !== 0 || gameBoard.figNum[figs.bQ] !== 0 ||
+    gameBoard.figNum[figs.wQ] !== 0 || gameBoard.figNum[figs.bQ] !== 0 ||
     gameBoard.figNum[figs.wR] !== 0 || gameBoard.figNum[figs.bR] !== 0 ||
-	gameBoard.figNum[figs.wB] > 1 || gameBoard.figNum[figs.bB] > 1 ||
+    gameBoard.figNum[figs.wB] > 1 || gameBoard.figNum[figs.bB] > 1 ||
     gameBoard.figNum[figs.wN] > 1 || gameBoard.figNum[figs.bN] > 1 ||
-	gameBoard.figNum[figs.wN] !== 0 && gameBoard.figNum[figs.wB] !== 0 ||
+    gameBoard.figNum[figs.wN] !== 0 && gameBoard.figNum[figs.wB] !== 0 ||
     gameBoard.figNum[figs.bN] !== 0 && gameBoard.figNum[figs.bB] !== 0) {
     return false;
   }
@@ -278,33 +270,35 @@ const threeFoldRep = () => {
   return r;
 };
 
-const checkResult = () => {
-  let str, draw = false;
+const isDraw = () => {
+  let str = '';
   if (gameBoard.fiftyMove >= 100) {
     str = 'Draw, fifty move rule';
-    draw = true;
   } else if (threeFoldRep() >= 2) {
     str = 'Draw, 3-fold repetition';
-    draw = true;
-  } else if (isDraw()) {
+  } else if (isEnoughFigures()) {
     str = 'Draw, not enough figures to mate';
-    draw = true;
   }
-  if (draw) {
+  return str;
+};
+
+const isAnyLegalMove = () => {
+  const start = gameBoard.moveListStart[gameBoard.ply];
+  const end = gameBoard.moveListStart[gameBoard.ply + 1];
+  for (let index = start; index < end; index++) {
+    if (isMoveLegal(gameBoard.moveList[index])) return true;
+  }
+  return false;
+};
+
+const checkResult = () => {
+  let str = isDraw();
+  if (str !== '') {
     gameOver(str);
     return true;
   }
   generateMoves();
-  let found = false;
-  const start = gameBoard.moveListStart[gameBoard.ply];
-  const end = gameBoard.moveListStart[gameBoard.ply + 1];
-  for (let index = start; index < end; index++) {
-    if (isMoveLegal(gameBoard.moveList[index])) {
-      found = true;
-      break;
-    }
-  }
-  if (found) return false;
+  if (isAnyLegalMove()) return false;
   const king = gameBoard.figList[figIndex(kings[gameBoard.side], 0)];
   if (isSqAttackedBySide(king, gameBoard.side ^ 1)) {
     if (gameBoard.side === colors.white) {
@@ -335,7 +329,7 @@ const checkAndSet = () => {
 
 const startSearch = () => {
   search.depth = maxDepth;
-  search.time = 2000;
+  search.time = 1000;
   searchPosition();
   makeMove(search.best);
   moveGuiFig(search.best);

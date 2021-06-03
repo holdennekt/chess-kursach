@@ -49,7 +49,7 @@ const evalPosition = () => {
   let fig = figs.wP;
   for (let figNum = 0; figNum < gameBoard.figNum[fig]; figNum++) {
     const sq = gameBoard.figList[figIndex(fig, figNum)];
-    const mirrored = tableMirrored(sq);
+    const mirrored = mirror(sq);
     score += pawnTable[mirrored[0]][mirrored[1]];
   }
   fig = figs.bP;
@@ -60,7 +60,7 @@ const evalPosition = () => {
   fig = figs.wN;
   for (let figNum = 0; figNum < gameBoard.figNum[fig]; figNum++) {
     const sq = gameBoard.figList[figIndex(fig, figNum)];
-    const mirrored = tableMirrored(sq);
+    const mirrored = mirror(sq);
     score += knightTable[mirrored[0]][mirrored[1]];
   }
   fig = figs.bN;
@@ -71,7 +71,7 @@ const evalPosition = () => {
   fig = figs.wB;
   for (let figNum = 0; figNum < gameBoard.figNum[fig]; figNum++) {
     const sq = gameBoard.figList[figIndex(fig, figNum)];
-    const mirrored = tableMirrored(sq);
+    const mirrored = mirror(sq);
     score += bishopTable[mirrored[0]][mirrored[1]];
   }
   fig = figs.bB;
@@ -82,7 +82,7 @@ const evalPosition = () => {
   fig = figs.wR;
   for (let figNum = 0; figNum < gameBoard.figNum[fig]; figNum++) {
     const sq = gameBoard.figList[figIndex(fig, figNum)];
-    const mirrored = tableMirrored(sq);
+    const mirrored = mirror(sq);
     score += rookTable[mirrored[0]][mirrored[1]];
   }
   fig = figs.bR;
@@ -93,7 +93,7 @@ const evalPosition = () => {
   fig = figs.wQ;
   for (let figNum = 0; figNum < gameBoard.figNum[fig]; figNum++) {
     const sq = gameBoard.figList[figIndex(fig, figNum)];
-    const mirrored = tableMirrored(sq);
+    const mirrored = mirror(sq);
     score += rookTable[mirrored[0]][mirrored[1]];
   }
   fig = figs.bQ;
