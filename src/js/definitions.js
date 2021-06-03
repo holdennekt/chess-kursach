@@ -105,7 +105,7 @@ const initGrid = () => {
   return res;
 };
 
-const grid = initGrid();
+let grid = initGrid();
 
 const logGrid = () => {
   console.log('-----------GRID----------');
