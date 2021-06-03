@@ -29,8 +29,8 @@ Chess implemented from scratch in js. In this game you can test your chess skill
 ### More complex moves
 
 <p align="center">
-<img src="./readme_assets/castling.gif" width="80%"></p>
-<img src="./readme_assets/enPas.gif" width="80%"></p>
+<img src="./readme_assets/castling.gif" width="50%"></p>
+<img src="./readme_assets/enPas.gif" width="50%"></p>
 
  * Нou can also make more difficult moves, for example castling or en passant. Above you can see how it works
 
