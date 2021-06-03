@@ -17,7 +17,7 @@ Chess implemented from scratch in js. In this game you can test your chess skill
 <p align="center">
 <img src="./readme_assets/3.gif" width="80%"></p>
 
- * To make a move, click on a piece and select the position to which you want to move this piece.
+ * To make a move, click on a piece and click on the suggested square.
 
 ### To capture piece
 
@@ -34,39 +34,19 @@ Chess implemented from scratch in js. In this game you can test your chess skill
 
  * Нou can also make more difficult moves, for example castling or en passant. Above you can see how it works
 
+### Pawn promotion
 
+<p align="center">
+<img src="./readme_assets/3.gif" width="80%"></p>
 
+ * When you reach the last square with a pawn, you can promote your pawn to any piece from list.
 
+### Mate
 
+<p align="center">
+<img src="./readme_assets/3.gif" width="80%"></p>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+ * When one side mates, you can start new game.
 
 
 ## Participants: 
