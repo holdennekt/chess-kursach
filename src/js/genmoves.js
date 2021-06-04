@@ -1,12 +1,14 @@
 'use strict';
 
 const mvvLvaValue = [
-  0, 100, 200, 300, 400, 500, 600,
-  100, 200, 300, 400, 500, 600
+  0, 100, 200, 300, 400, 500, 600, 100, 200, 300, 400, 500, 600,
 ];
 
-const captureBonus = 1000000, enPasBonus = 1000105;
-const killerBonus = 900000, killerBonus2 = 800000, pvBonus = 2000000;
+const captureBonus = 1000000;
+const enPasBonus = 1000105;
+const killerBonus = 900000;
+const killerBonus2 = 800000;
+const pvBonus = 2000000;
 
 const initMvvLva = () => {
   const res = [];
@@ -77,28 +79,33 @@ const whitePawns = () => {
     if (grid[sq[0] - 1][sq[1]] === figs.empty) {
       addWhitePawnMove(sq, [sq[0] - 1, sq[1]]);
       if (sq[0] === 6 && grid[sq[0] - 2][sq[1]] === figs.empty) {
-        addMove(sq, [sq[0] - 2, sq[1]], figs.empty,
-          figs.empty, Flag(false, true));
+        addMove(
+          sq,
+          [sq[0] - 2, sq[1]],
+          figs.empty,
+          figs.empty,
+          Flag(false, true)
+        );
       }
     }
-    if (grid[sq[0] - 1][sq[1] - 1] > figs.empty &&
-        figCol[grid[sq[0] - 1][sq[1] - 1]] === colors.black) {
-      addWhitePawnMove(sq, [sq[0] - 1, sq[1] - 1],
-        grid[sq[0] - 1][sq[1] - 1]);
+    if (
+      grid[sq[0] - 1][sq[1] - 1] > figs.empty &&
+      figCol[grid[sq[0] - 1][sq[1] - 1]] === colors.black
+    ) {
+      addWhitePawnMove(sq, [sq[0] - 1, sq[1] - 1], grid[sq[0] - 1][sq[1] - 1]);
     }
-    if (grid[sq[0] - 1][sq[1] + 1] > figs.empty &&
-        figCol[grid[sq[0] - 1][sq[1] + 1]] === colors.black) {
-      addWhitePawnMove(sq, [sq[0] - 1, sq[1] + 1],
-        grid[sq[0] - 1][sq[1] + 1]);
+    if (
+      grid[sq[0] - 1][sq[1] + 1] > figs.empty &&
+      figCol[grid[sq[0] - 1][sq[1] + 1]] === colors.black
+    ) {
+      addWhitePawnMove(sq, [sq[0] - 1, sq[1] + 1], grid[sq[0] - 1][sq[1] + 1]);
     }
     if (!arrsEqual(gameBoard.enPas, noSq())) {
       if (arrsEqual(gameBoard.enPas, [sq[0] - 1, sq[1] - 1])) {
-        addMove(sq, [sq[0] - 1, sq[1] - 1],
-          figs.empty, figs.empty, Flag(true));
+        addMove(sq, [sq[0] - 1, sq[1] - 1], figs.empty, figs.empty, Flag(true));
       }
       if (arrsEqual(gameBoard.enPas, [sq[0] - 1, sq[1] + 1])) {
-        addMove(sq, [sq[0] - 1, sq[1] + 1],
-          figs.empty, figs.empty, Flag(true));
+        addMove(sq, [sq[0] - 1, sq[1] + 1], figs.empty, figs.empty, Flag(true));
       }
     }
   }
@@ -111,28 +118,33 @@ const blackPawns = () => {
     if (grid[sq[0] + 1][sq[1]] === figs.empty) {
       addBlackPawnMove(sq, [sq[0] + 1, sq[1]]);
       if (sq[0] === 1 && grid[sq[0] + 2][sq[1]] === figs.empty) {
-        addMove(sq, [sq[0] + 2, sq[1]], figs.empty,
-          figs.empty, Flag(false, true));
+        addMove(
+          sq,
+          [sq[0] + 2, sq[1]],
+          figs.empty,
+          figs.empty,
+          Flag(false, true)
+        );
       }
     }
-    if (grid[sq[0] + 1][sq[1] - 1] > figs.empty &&
-        figCol[grid[sq[0] + 1][sq[1] - 1]] === colors.white) {
-      addBlackPawnMove(sq, [sq[0] + 1, sq[1] - 1],
-        grid[sq[0] + 1][sq[1] - 1]);
+    if (
+      grid[sq[0] + 1][sq[1] - 1] > figs.empty &&
+      figCol[grid[sq[0] + 1][sq[1] - 1]] === colors.white
+    ) {
+      addBlackPawnMove(sq, [sq[0] + 1, sq[1] - 1], grid[sq[0] + 1][sq[1] - 1]);
     }
-    if (grid[sq[0] + 1][sq[1] + 1] > figs.empty &&
-        figCol[grid[sq[0] + 1][sq[1] + 1]] === colors.white) {
-      addBlackPawnMove(sq, [sq[0] + 1, sq[1] + 1],
-        grid[sq[0] + 1][sq[1] + 1]);
+    if (
+      grid[sq[0] + 1][sq[1] + 1] > figs.empty &&
+      figCol[grid[sq[0] + 1][sq[1] + 1]] === colors.white
+    ) {
+      addBlackPawnMove(sq, [sq[0] + 1, sq[1] + 1], grid[sq[0] + 1][sq[1] + 1]);
     }
     if (!arrsEqual(gameBoard.enPas, noSq())) {
       if (arrsEqual(gameBoard.enPas, [sq[0] + 1, sq[1] - 1])) {
-        addMove(sq, [sq[0] + 1, sq[1] - 1], figs.empty,
-          figs.empty, Flag(true));
+        addMove(sq, [sq[0] + 1, sq[1] - 1], figs.empty, figs.empty, Flag(true));
       }
       if (arrsEqual(gameBoard.enPas, [sq[0] + 1, sq[1] + 1])) {
-        addMove(sq, [sq[0] + 1, sq[1] + 1], figs.empty,
-          figs.empty, Flag(true));
+        addMove(sq, [sq[0] + 1, sq[1] + 1], figs.empty, figs.empty, Flag(true));
       }
     }
   }
@@ -140,27 +152,43 @@ const blackPawns = () => {
 
 const castle = side => {
   let i, color;
-  if (side === colors.white) i = 7, color = 'white';
-  else i = 0, color = 'black';
+  if (side === colors.white) (i = 7), (color = 'white');
+  else (i = 0), (color = 'black');
   if (gameBoard.castlePerm[color + 'KSide']) {
     if (grid[i][5] === figs.empty && grid[i][6] === figs.empty) {
-      if (!isSqAttackedBySide([i, 4], colors[color] ^ 1) &&
-          !isSqAttackedBySide([i, 5], colors[color] ^ 1) &&
-          !isSqAttackedBySide([i, 6], colors[color] ^ 1)) {
-        addMove([i, 4], [i, 6], figs.empty, figs.empty,
-          Flag(false, false, color + 'KSide'));
+      if (
+        !isSqAttackedBySide([i, 4], colors[color] ^ 1) &&
+        !isSqAttackedBySide([i, 5], colors[color] ^ 1) &&
+        !isSqAttackedBySide([i, 6], colors[color] ^ 1)
+      ) {
+        addMove(
+          [i, 4],
+          [i, 6],
+          figs.empty,
+          figs.empty,
+          Flag(false, false, color + 'KSide')
+        );
       }
     }
   }
   if (gameBoard.castlePerm[color + 'QSide']) {
-    if (grid[i][1] === figs.empty &&
+    if (
+      grid[i][1] === figs.empty &&
       grid[i][2] === figs.empty &&
-      grid[i][3] === figs.empty) {
-      if (!isSqAttackedBySide([i, 2], colors[color] ^ 1) &&
-          !isSqAttackedBySide([i, 3], colors[color] ^ 1) &&
-          !isSqAttackedBySide([i, 4], colors[color] ^ 1)) {
-        addMove([i, 4], [i, 2], figs.empty, figs.empty,
-          Flag(false, false, color + 'QSide'));
+      grid[i][3] === figs.empty
+    ) {
+      if (
+        !isSqAttackedBySide([i, 2], colors[color] ^ 1) &&
+        !isSqAttackedBySide([i, 3], colors[color] ^ 1) &&
+        !isSqAttackedBySide([i, 4], colors[color] ^ 1)
+      ) {
+        addMove(
+          [i, 4],
+          [i, 2],
+          figs.empty,
+          figs.empty,
+          Flag(false, false, color + 'QSide')
+        );
       }
     }
   }
@@ -220,11 +248,11 @@ const generateMoves = () => {
   if (gameBoard.side === colors.white) {
     whitePawns();
     castle(colors.white);
-    startIndex1 = 0, startIndex2 = 0;
+    (startIndex1 = 0), (startIndex2 = 0);
   } else {
     blackPawns();
     castle(colors.black);
-    startIndex1 = 2, startIndex2 = 3;
+    (startIndex1 = 2), (startIndex2 = 3);
   }
   noSlide(startIndex1);
   slide(startIndex2);

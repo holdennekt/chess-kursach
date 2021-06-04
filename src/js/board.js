@@ -1,18 +1,18 @@
 'use strict';
 
 const gameBoard = {
-  'side': colors.white,
-  'fiftyMove': 0,
-  'hisPly': 0,
-  'ply': 0,
-  'castlePerm': {
+  side: colors.white,
+  fiftyMove: 0,
+  hisPly: 0,
+  ply: 0,
+  castlePerm: {
     whiteKSide: true,
     whiteQSide: true,
     blackKSide: true,
     blackQSide: true,
   },
-  'enPas': noSq(),
-  'history': arrHistory(maxGameMoves),
+  enPas: noSq(),
+  history: arrHistory(maxGameMoves),
 };
 gameBoard.material = [0, 0];
 gameBoard.figList = arr0(typesOfFigures * maxFigNum);
@@ -51,7 +51,7 @@ const genPosKey = () => {
     for (let j = 0; j < size; j++) {
       fig = grid[i][j];
       if (fig !== figs.empty && fig !== figs.offBoard) {
-        finalKey ^= figKeys[(fig * gridSqNum) + (size * i + j)];
+        finalKey ^= figKeys[fig * gridSqNum + (size * i + j)];
       }
     }
   }
@@ -68,7 +68,8 @@ const genPosKey = () => {
 
 const knBiRkKi = (sq, side, obj) => {
   let knight, bishop, rook, queen, king;
-  const i = sq[0], j = sq[1];
+  const i = sq[0],
+    j = sq[1];
   if (side === colors.white) {
     knight = figs.wN;
     bishop = figs.wB;
@@ -88,29 +89,29 @@ const knBiRkKi = (sq, side, obj) => {
     }
   }
   for (const dir of BiDir) {
-    let tempI = i + dir[0], tempJ = j + dir[1];
+    let tempI = i + dir[0],
+      tempJ = j + dir[1];
     while (obj[tempI][tempJ] !== figs.offBoard) {
       if (obj[tempI][tempJ] !== figs.empty) {
-        if (obj[tempI][tempJ] === bishop ||
-            obj[tempI][tempJ] === queen) {
+        if (obj[tempI][tempJ] === bishop || obj[tempI][tempJ] === queen) {
           return true;
         }
         break;
       }
-      tempI += dir[0], tempJ += dir[1];
+      (tempI += dir[0]), (tempJ += dir[1]);
     }
   }
   for (const dir of RkDir) {
-    let tempI = i + dir[0], tempJ = j + dir[1];
+    let tempI = i + dir[0],
+      tempJ = j + dir[1];
     while (obj[tempI][tempJ] !== figs.offBoard) {
       if (obj[tempI][tempJ] !== figs.empty) {
-        if (obj[tempI][tempJ] === rook ||
-            obj[tempI][tempJ] === queen) {
+        if (obj[tempI][tempJ] === rook || obj[tempI][tempJ] === queen) {
           return true;
         }
         break;
       }
-      tempI += dir[0], tempJ += dir[1];
+      (tempI += dir[0]), (tempJ += dir[1]);
     }
   }
   for (const dir of KiDir) {
@@ -122,7 +123,8 @@ const knBiRkKi = (sq, side, obj) => {
 };
 
 const isSqAttackedBySide = (sq, side, obj = grid) => {
-  const i = sq[0], j = sq[1];
+  const i = sq[0],
+    j = sq[1];
   if (side === colors.white) {
     if (obj[i + 1][j - 1] === figs.wP || obj[i + 1][j + 1] === figs.wP) {
       return true;

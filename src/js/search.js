@@ -32,7 +32,7 @@ const pickNextMove = moveNum => {
 };
 
 const checkTime = () => {
-  if ((Date.now() - search.start) > search.time) search.stop = true;
+  if (Date.now() - search.start > search.time) search.stop = true;
 };
 
 const isRepetition = () => {
@@ -63,7 +63,8 @@ const quiescence = (alpha, beta) => {
     alpha = score;
   }
   generateMoves();
-  let legal = 0, bestMove = emptyMove();
+  let legal = 0,
+    bestMove = emptyMove();
   const oldAlpha = alpha;
   const start = gameBoard.moveListStart[gameBoard.ply];
   const end = gameBoard.moveListStart[gameBoard.ply + 1];
@@ -124,7 +125,8 @@ const alphaBeta = (alpha, beta, depth) => {
   if (inCheck) depth++;
   let score = -inf;
   generateMoves();
-  let legal = 0, bestMove = emptyMove();
+  let legal = 0,
+    bestMove = emptyMove();
   const oldAlpha = alpha;
   const pvMove = probePvTable();
   const index = searchPvMove(pvMove);
@@ -151,7 +153,8 @@ const alphaBeta = (alpha, beta, depth) => {
         return beta;
       }
       if (move.captured === 0) {
-        const from = move.from, to = move.to;
+        const from = move.from,
+          to = move.to;
         const index = grid[from[0]][from[1]] * gridSqNum + sq120(mirror(to));
         gameBoard.searchHistory[index] += depth * depth;
       }
@@ -182,7 +185,9 @@ const clearForSearch = () => {
 };
 
 const searchPosition = () => {
-  let bestScore = -inf, curDepth = 0, bestMove;
+  let bestScore = -inf,
+    curDepth = 0,
+    bestMove;
   clearForSearch();
   for (curDepth = 1; curDepth <= search.depth; curDepth++) {
     bestScore = alphaBeta(-inf, inf, curDepth);
@@ -196,8 +201,8 @@ const searchPosition = () => {
       lineInfo += ` ${gameBoard.pvArr[i].from} -> ${gameBoard.pvArr[i].to}`;
     }
     if (curDepth !== 1) {
-      const temp = search.failHighFirst / search.failHigh * 100;
-      lineInfo +=  ` Ordering: ${temp.toFixed(2)}%`;
+      const temp = (search.failHighFirst / search.failHigh) * 100;
+      lineInfo += ` Ordering: ${temp.toFixed(2)}%`;
     }
     console.log(lineInfo);
   }

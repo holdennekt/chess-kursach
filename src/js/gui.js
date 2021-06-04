@@ -6,12 +6,16 @@ const userMove = {
   promoted: figs.empty,
 };
 
-const chosen = async block => new Promise(resolve => block.onclick = click => {
-  const clickedOn = click.target.id;
-  const parent = document.querySelector('#parent');
-  parent.removeChild(document.querySelector('.promotion'));
-  resolve(figs[clickedOn]);
-});
+const chosen = async block =>
+  new Promise(
+    resolve =>
+      (block.onclick = click => {
+        const clickedOn = click.target.id;
+        const parent = document.querySelector('#parent');
+        parent.removeChild(document.querySelector('.promotion'));
+        resolve(figs[clickedOn]);
+      })
+  );
 
 const suggestPromotion = async () => {
   const blockPromotion = document.createElement('div');
@@ -67,7 +71,8 @@ const parseMove = async (from, to) => {
   generateMoves();
   const start = gameBoard.moveListStart[gameBoard.ply];
   const end = gameBoard.moveListStart[gameBoard.ply + 1];
-  let found = false, move;
+  let found = false,
+    move;
   for (let index = start; index < end; index++) {
     move = gameBoard.moveList[index];
     if (arrsEqual(move.from, from) && arrsEqual(move.to, to)) {
@@ -140,7 +145,8 @@ const removeGuiFig = sq => {
 };
 
 const addGuiFig = (sq, fig) => {
-  const i = sq[0], j = sq[1];
+  const i = sq[0],
+    j = sq[1];
   const img = new Image();
   img.src = `icons/${fig}.png`;
   img.className = `figure rank${i} file${j}`;
@@ -162,7 +168,8 @@ const moveGuiFig = move => {
   figOnSq.classList.remove(`rank${move.from[0]}`, `file${move.from[1]}`);
   figOnSq.classList.add(`rank${move.to[0]}`, `file${move.to[1]}`);
   switch (move.flag.castling) {
-  case '': break;
+  case '':
+    break;
   case 'whiteKSide':
     removeGuiFig([7, 7]);
     addGuiFig([7, 5], figs.wR);
@@ -201,7 +208,8 @@ const suggestMoves = from => {
 };
 
 const makeUserMove = async () => {
-  const from = userMove.from, to = userMove.to;
+  const from = userMove.from,
+    to = userMove.to;
   if (notEmptyMove(from)) suggestMoves(from);
   if (notEmptyMove(from, to)) {
     const parsed = await parseMove(from, to);
@@ -220,23 +228,28 @@ const makeUserMove = async () => {
 
 const clickedOnSquare = (i, j) => {
   if (notEmptyMove(userMove.from)) {
-    userMove.to[0] = i, userMove.to[1] = j;
+    (userMove.to[0] = i), (userMove.to[1] = j);
     makeUserMove();
   }
 };
 
 const clickedOnFigure = (i, j) => {
   selectSquares(i, j);
-  if (arrsEqual(userMove.from, [-1, -1]) &&
-      figCol[grid[i][j]] === gameBoard.side) {
-    userMove.from[0] = i, userMove.from[1] = j;
-  } else if (arrsEqual(userMove.from, [-1, -1]) &&
-            figCol[grid[i][j]] !== gameBoard.side) return;
+  if (
+    arrsEqual(userMove.from, [-1, -1]) &&
+    figCol[grid[i][j]] === gameBoard.side
+  ) {
+    (userMove.from[0] = i), (userMove.from[1] = j);
+  } else if (
+    arrsEqual(userMove.from, [-1, -1]) &&
+    figCol[grid[i][j]] !== gameBoard.side
+  )
+    return;
   else {
     const figFrom = grid[userMove.from[0]][userMove.from[1]];
     if (figCol[grid[i][j]] === figCol[figFrom]) {
-      userMove.from[0] = i, userMove.from[1] = j;
-    } else userMove.to[0] = i, userMove.to[1] = j;
+      (userMove.from[0] = i), (userMove.from[1] = j);
+    } else (userMove.to[0] = i), (userMove.to[1] = j);
   }
   makeUserMove();
 };
@@ -250,13 +263,20 @@ const clicked = click => {
 };
 
 const isEnoughFigures = () => {
-  if (gameBoard.figNum[figs.wP] !== 0 || gameBoard.figNum[figs.bP] !== 0 ||
-    gameBoard.figNum[figs.wQ] !== 0 || gameBoard.figNum[figs.bQ] !== 0 ||
-    gameBoard.figNum[figs.wR] !== 0 || gameBoard.figNum[figs.bR] !== 0 ||
-    gameBoard.figNum[figs.wB] > 1 || gameBoard.figNum[figs.bB] > 1 ||
-    gameBoard.figNum[figs.wN] > 1 || gameBoard.figNum[figs.bN] > 1 ||
-    gameBoard.figNum[figs.wN] !== 0 && gameBoard.figNum[figs.wB] !== 0 ||
-    gameBoard.figNum[figs.bN] !== 0 && gameBoard.figNum[figs.bB] !== 0) {
+  if (
+    gameBoard.figNum[figs.wP] !== 0 ||
+    gameBoard.figNum[figs.bP] !== 0 ||
+    gameBoard.figNum[figs.wQ] !== 0 ||
+    gameBoard.figNum[figs.bQ] !== 0 ||
+    gameBoard.figNum[figs.wR] !== 0 ||
+    gameBoard.figNum[figs.bR] !== 0 ||
+    gameBoard.figNum[figs.wB] > 1 ||
+    gameBoard.figNum[figs.bB] > 1 ||
+    gameBoard.figNum[figs.wN] > 1 ||
+    gameBoard.figNum[figs.bN] > 1 ||
+    (gameBoard.figNum[figs.wN] !== 0 && gameBoard.figNum[figs.wB] !== 0) ||
+    (gameBoard.figNum[figs.bN] !== 0 && gameBoard.figNum[figs.bB] !== 0)
+  ) {
     return false;
   }
   return true;
@@ -339,6 +359,8 @@ const startSearch = () => {
 const preSearch = () => {
   if (!gameController.gameOver) {
     search.thinking = true;
-    setTimeout(() => { startSearch(); }, 200);
+    setTimeout(() => {
+      startSearch();
+    }, 200);
   }
 };
