@@ -7,6 +7,21 @@
 
 Chess implemented from scratch in js. In this game you can test your chess skills. You will have to play against a complex algorithm and you will have to use all your skills to defeat it. In our code all possible variations of moves are implemented, from the usual pawn move to castling and en passant.
 
+## Installation
+
+1. Clone the repository:
+```bash
+$ git clone https://github.com/holdennekt/chess_kursach
+```
+2. Open folder:
+```bash
+$ cd chess_kursach
+```
+3. Run the program:
+```bash
+$ google-chrome --new-tab index.html
+```
+
 ## How to play
 
 ### Make a move
@@ -50,3 +65,5 @@ Chess implemented from scratch in js. In this game you can test your chess skill
 ## Participants: 
 * Nikita Gryshak - https://github.com/holdennekt
 * Bohdan Pinchuk - https://github.com/BogPin
+
+
