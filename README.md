@@ -15,7 +15,7 @@ $ git clone https://github.com/holdennekt/chess_kursach
 ```
 2. Open folder:
 ```bash
-$ cd chess_kursach
+$ cd chess_kursach/src
 ```
 3. Run the program:
 ```bash
