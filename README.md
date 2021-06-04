@@ -66,4 +66,7 @@ $ google-chrome --new-tab index.html
 * Nikita Gryshak - https://github.com/holdennekt
 * Bohdan Pinchuk - https://github.com/BogPin
 
+## License
+This program is distributed under an [MIT License](https://github.com/holdennekt/chess_kursach/blob/main/LICENSE).
+
 
