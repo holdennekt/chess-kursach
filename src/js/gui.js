@@ -13,7 +13,7 @@ const chosen = async block =>
         const clickedOn = click.target.id;
         const parent = document.querySelector('#parent');
         parent.removeChild(document.querySelector('.promotion'));
-        resolve(figs[clickedOn]);
+        resolve(figs[clickedOn].id);
       })
   );
 
@@ -30,7 +30,7 @@ const suggestPromotion = async () => {
   let dark = 1;
   for (const elem of list) {
     const img = new Image();
-    img.src = `icons/${figs[elem]}.png`;
+    img.src = `icons/${figs[elem].id}.png`;
     img.id = elem;
     img.className = 'suggestion';
     if (dark === 1) img.classList.add('dark');
@@ -39,32 +39,6 @@ const suggestPromotion = async () => {
     images.append(img);
   }
   return await chosen(blockPromotion);
-};
-
-const newGame = () => {
-  const blockGameOver = document.querySelector('.gameOver');
-  const btnNewGame = document.querySelector('.btnNewGame');
-  document.querySelector('#parent').removeChild(blockGameOver);
-  document.querySelector('#parent').removeChild(btnNewGame);
-  resetBoard();
-  gameBoard.posKey = genPosKey();
-  updateMaterialAndFigList();
-  generateMoves();
-};
-
-const gameOver = str => {
-  const block = document.createElement('div');
-  const text = document.createElement('p');
-  const btn = document.createElement('button');
-  block.className = 'gameOver';
-  text.className = 'gameStatus';
-  text.innerHTML = str;
-  btn.className = 'btnNewGame';
-  btn.innerHTML = 'New game';
-  btn.onclick = newGame;
-  document.querySelector('#parent').appendChild(block);
-  block.appendChild(text);
-  document.querySelector('#parent').appendChild(btn);
 };
 
 const parseMove = async (from, to) => {
@@ -110,7 +84,8 @@ const deselectSquares = () => {
 
 const selectSquares = (i, j, suggest = []) => {
   deselectSquares();
-  if (figCol[grid[i][j]] === gameBoard.side) {
+  const key = getKeyById(figs, grid[i][j]);
+  if (figs[key].color === gameBoard.side) {
     let str = `.rank${i}.file${j}`;
     document.querySelectorAll(str)[0].className += ' selected';
     for (const elem of suggest) {
@@ -145,8 +120,8 @@ const removeGuiFig = sq => {
 };
 
 const addGuiFig = (sq, fig) => {
-  const i = sq[0],
-    j = sq[1];
+  const i = sq[0];
+  const j = sq[1];
   const img = new Image();
   img.src = `icons/${fig}.png`;
   img.className = `figure rank${i} file${j}`;
@@ -172,19 +147,19 @@ const moveGuiFig = move => {
     break;
   case 'whiteKSide':
     removeGuiFig([7, 7]);
-    addGuiFig([7, 5], figs.wR);
+    addGuiFig([7, 5], figs.wR.id);
     break;
   case 'whiteQSide':
     removeGuiFig([7, 0]);
-    addGuiFig([7, 3], figs.wR);
+    addGuiFig([7, 3], figs.wR.id);
     break;
   case 'blackKSide':
     removeGuiFig([0, 7]);
-    addGuiFig([0, 5], figs.bR);
+    addGuiFig([0, 5], figs.bR.id);
     break;
   case 'blackQSide':
     removeGuiFig([0, 0]);
-    addGuiFig([0, 3], figs.bR);
+    addGuiFig([0, 3], figs.bR.id);
     break;
   }
   if (move.promoted !== figs.empty) {
@@ -216,7 +191,6 @@ const makeUserMove = async () => {
     if (notEmptyMove(parsed.from, parsed.to)) {
       makeMove(parsed);
       moveGuiFig(parsed);
-      logGrid();
       checkAndSet();
       preSearch();
     }
@@ -235,19 +209,21 @@ const clickedOnSquare = (i, j) => {
 
 const clickedOnFigure = (i, j) => {
   selectSquares(i, j);
+  const key = getKeyById(figs, grid[i][j]);
   if (
     arrsEqual(userMove.from, [-1, -1]) &&
-    figCol[grid[i][j]] === gameBoard.side
+    figs[key].color === gameBoard.side
   ) {
     (userMove.from[0] = i), (userMove.from[1] = j);
   } else if (
     arrsEqual(userMove.from, [-1, -1]) &&
-    figCol[grid[i][j]] !== gameBoard.side
+    figs[key].color !== gameBoard.side
   )
     return;
   else {
     const figFrom = grid[userMove.from[0]][userMove.from[1]];
-    if (figCol[grid[i][j]] === figCol[figFrom]) {
+    const keyFigFrom = getKeyById(figs, figFrom);
+    if (figs[key].color === figs[keyFigFrom].color) {
       (userMove.from[0] = i), (userMove.from[1] = j);
     } else (userMove.to[0] = i), (userMove.to[1] = j);
   }
@@ -262,20 +238,54 @@ const clicked = click => {
   else if (targetClass.includes('figure')) clickedOnFigure(i, j);
 };
 
+const newGame = () => {
+  const blockGameOver = document.querySelectorAll('.gameOver');
+  const btnNewGame = document.querySelectorAll('.btnNewGame');
+  for (const el of blockGameOver) {
+    document.querySelector('#parent').removeChild(el);
+  }
+  for (const el of btnNewGame) {
+    document.querySelector('#parent').removeChild(el);
+  }
+  document.querySelector('#container').addEventListener('mousedown', clicked);
+  resetBoard();
+  gameBoard.posKey = genPosKey();
+  updateMaterialAndFigList();
+  generateMoves();
+};
+
+const gameOver = str => {
+  const block = document.createElement('div');
+  const text = document.createElement('p');
+  const btn = document.createElement('button');
+  block.className = 'gameOver';
+  text.className = 'gameStatus';
+  text.innerHTML = str;
+  btn.className = 'btnNewGame';
+  btn.innerHTML = 'New game';
+  btn.onclick = newGame;
+  document.querySelector('#parent').appendChild(block);
+  block.appendChild(text);
+  document.querySelector('#parent').appendChild(btn);
+  const container = document.querySelector('#container');
+  container.removeEventListener('mousedown', clicked);
+};
+
 const isEnoughFigures = () => {
   if (
-    gameBoard.figNum[figs.wP] !== 0 ||
-    gameBoard.figNum[figs.bP] !== 0 ||
-    gameBoard.figNum[figs.wQ] !== 0 ||
-    gameBoard.figNum[figs.bQ] !== 0 ||
-    gameBoard.figNum[figs.wR] !== 0 ||
-    gameBoard.figNum[figs.bR] !== 0 ||
-    gameBoard.figNum[figs.wB] > 1 ||
-    gameBoard.figNum[figs.bB] > 1 ||
-    gameBoard.figNum[figs.wN] > 1 ||
-    gameBoard.figNum[figs.bN] > 1 ||
-    (gameBoard.figNum[figs.wN] !== 0 && gameBoard.figNum[figs.wB] !== 0) ||
-    (gameBoard.figNum[figs.bN] !== 0 && gameBoard.figNum[figs.bB] !== 0)
+    gameBoard.figNum[figs.wP.id] !== 0 ||
+    gameBoard.figNum[figs.bP.id] !== 0 ||
+    gameBoard.figNum[figs.wQ.id] !== 0 ||
+    gameBoard.figNum[figs.bQ.id] !== 0 ||
+    gameBoard.figNum[figs.wR.id] !== 0 ||
+    gameBoard.figNum[figs.bR.id] !== 0 ||
+    gameBoard.figNum[figs.wB.id] > 1 ||
+    gameBoard.figNum[figs.bB.id] > 1 ||
+    gameBoard.figNum[figs.wN.id] > 1 ||
+    gameBoard.figNum[figs.bN.id] > 1 ||
+    (gameBoard.figNum[figs.wN.id] !== 0 &&
+      gameBoard.figNum[figs.wB.id] !== 0) ||
+    (gameBoard.figNum[figs.bN.id] !== 0 && gameBoard.figNum[figs.bB.id] !== 0)
   ) {
     return false;
   }
@@ -349,7 +359,7 @@ const checkAndSet = () => {
 
 const startSearch = () => {
   search.depth = maxDepth;
-  search.time = 1000;
+  search.time = 2000;
   searchPosition();
   makeMove(search.best);
   moveGuiFig(search.best);

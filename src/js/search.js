@@ -36,7 +36,7 @@ const checkTime = () => {
 };
 
 const isRepetition = () => {
-  const start = gameBoard.hisPly - gameBoard.fiftymove;
+  const start = gameBoard.hisPly - gameBoard.fiftyMove;
   for (let i = start; i < gameBoard.hisPly - 1; i++) {
     if (gameBoard.posKey === gameBoard.history[i].posKey) {
       return true;
@@ -48,7 +48,7 @@ const isRepetition = () => {
 const quiescence = (alpha, beta) => {
   if (search.nodes % 2048 === 0) checkTime();
   search.nodes++;
-  const statement = isRepetition() || gameBoard.fiftymove >= 100;
+  const statement = isRepetition() || gameBoard.fiftyMove >= 100;
   if (statement && gameBoard.ply !== 0) {
     return 0;
   }
@@ -111,7 +111,7 @@ const alphaBeta = (alpha, beta, depth) => {
   }
   if (search.nodes % 2048 === 0) checkTime();
   search.nodes++;
-  const statement = isRepetition() || gameBoard.fiftymove >= 100;
+  const statement = isRepetition() || gameBoard.fiftyMove >= 100;
   if (statement && gameBoard.ply !== 0) {
     return 0;
   }

@@ -2,10 +2,11 @@
 
 const clearFig = (sq, obj = gameBoard, board = grid) => {
   const fig = board[sq[0]][sq[1]];
-  const col = figCol[fig];
+  const key = getKeyById(figs, fig);
+  const col = figs[key].color;
   let tFigNum = -1;
   board[sq[0]][sq[1]] = figs.empty;
-  obj.material[col] -= figValue[fig];
+  obj.material[col] -= figs[key].value;
   for (let i = 0; i < obj.figNum[fig]; i++) {
     if (
       obj.figList[figIndex(fig, i)][0] === sq[0] &&
@@ -21,9 +22,10 @@ const clearFig = (sq, obj = gameBoard, board = grid) => {
 };
 
 const addFig = (sq, fig, obj = gameBoard, board = grid) => {
-  const col = figCol[fig];
+  const key = getKeyById(figs, fig);
+  const col = figs[key].color;
   board[sq[0]][sq[1]] = fig;
-  obj.material[col] += figValue[fig];
+  obj.material[col] += figs[key].value;
   obj.figList[figIndex(fig, obj.figNum[fig])] = sq;
   obj.figNum[fig]++;
 };
@@ -112,9 +114,9 @@ const takeMove = () => {
   hashSide();
   if (move.flag.enPas) {
     if (gameBoard.side === colors.white) {
-      addFig([to[0] + 1, to[1]], figs.bP);
+      addFig([to[0] + 1, to[1]], figs.bP.id);
     } else {
-      addFig([to[0] - 1, to[1]], figs.wP);
+      addFig([to[0] - 1, to[1]], figs.wP.id);
     }
   }
   checkCastling(move.flag.castling, 'reverse');
@@ -124,8 +126,9 @@ const takeMove = () => {
   }
   if (move.promoted !== figs.empty) {
     clearFig(from);
-    const statement = figCol[move.promoted] === colors.white;
-    addFig(from, statement ? figs.wP : figs.bP);
+    const key = getKeyById(figs, move.promoted);
+    const statement = figs[key].color === colors.white;
+    addFig(from, statement ? figs.wP.id : figs.bP.id);
   }
 };
 
@@ -142,6 +145,7 @@ const makeMove = move => {
   const side = gameBoard.side;
   const from = move.from,
     to = move.to;
+  gameBoard.history[gameBoard.hisPly].posKey = gameBoard.posKey;
   if (move.flag.enPas) {
     if (side === colors.white) {
       clearFig([to[0] + 1, to[1]]);
@@ -164,7 +168,8 @@ const makeMove = move => {
   gameBoard.hisPly++;
   gameBoard.ply++;
   const isPawn =
-    grid[from[0]][from[1]] === figs.wP || grid[from[0]][from[1]] === figs.bP;
+    grid[from[0]][from[1]] === figs.wP.id ||
+    grid[from[0]][from[1]] === figs.bP.id;
   if (isPawn) {
     gameBoard.fiftyMove = 0;
     if (move.flag.pawnStart) {

@@ -1,10 +1,10 @@
 'use strict';
 
-const block = document.querySelector('#container');
+const boardBlock = document.querySelector('#container');
 
-block.addEventListener('click', clicked);
+boardBlock.addEventListener('mousedown', clicked);
 
-createBoard(block);
+createBoard(boardBlock);
 
 const init = () => {
   updateMaterialAndFigList();

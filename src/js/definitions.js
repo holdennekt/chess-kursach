@@ -1,51 +1,7 @@
 'use strict';
 
-const figs = {
-  offBoard: -1,
-  empty: 0,
-  wP: 1,
-  wN: 2,
-  wB: 3,
-  wR: 4,
-  wQ: 5,
-  wK: 6,
-  bP: 7,
-  bN: 8,
-  bB: 9,
-  bR: 10,
-  bQ: 11,
-  bK: 12,
-};
-
-const size = 8,
-  gridSqNum = 120;
-const maxFigNum = 10,
-  typesOfFigures = 12;
-
-const revFigs = [
-  '. ',
-  'wP',
-  'wN',
-  'wB',
-  'wR',
-  'wQ',
-  'wK',
-  'bP',
-  'bN',
-  'bB',
-  'bR',
-  'bQ',
-  'bK',
-];
-
-const colors = {
-  white: 0,
-  black: 1,
-  both: 2,
-};
-
 //directions of figs moves
-const KnDir = [
+const knDir = [
   [-1, 2],
   [-2, 1],
   [-2, -1],
@@ -55,19 +11,29 @@ const KnDir = [
   [2, 1],
   [1, 2],
 ];
-const BiDir = [
+const biDir = [
   [-1, 1],
   [-1, -1],
   [1, -1],
   [1, 1],
 ];
-const RkDir = [
+const rkDir = [
   [0, 1],
   [-1, 0],
   [0, -1],
   [1, 0],
 ];
-const KiDir = [
+const qnDir = [
+  [0, 1],
+  [-1, 1],
+  [-1, 0],
+  [-1, -1],
+  [0, -1],
+  [1, -1],
+  [1, 0],
+  [1, 1],
+];
+const kiDir = [
   [0, 1],
   [-1, 1],
   [-1, 0],
@@ -78,46 +44,37 @@ const KiDir = [
   [1, 1],
 ];
 
-const figDir = [
-  //direction of move for particular figure
-  0,
-  0,
-  KnDir,
-  BiDir,
-  RkDir,
-  KiDir,
-  KiDir,
-  0,
-  KnDir,
-  BiDir,
-  RkDir,
-  KiDir,
-  KiDir,
-];
-const noSlideFigs = [figs.wN, figs.wK, figs.bN, figs.bK];
-const slideFigs = [figs.wB, figs.wR, figs.wQ, figs.bB, figs.bR, figs.bQ];
+const colors = {
+  white: 0,
+  black: 1,
+  both: 2,
+};
 
-const figValue = [
-  //value for particular figure
-  0, 100, 325, 325, 550, 1000, 50000, 100, 325, 325, 550, 1000, 50000,
-];
+const figs = {
+  offBoard: -1,
+  empty: 0,
+  wP: { id: 1, value: 100, color: colors.white },
+  wN: { id: 2, dirs: knDir, slide: false, value: 325, color: colors.white },
+  wB: { id: 3, dirs: biDir, slide: true, value: 325, color: colors.white },
+  wR: { id: 4, dirs: rkDir, slide: true, value: 550, color: colors.white },
+  wQ: { id: 5, dirs: qnDir, slide: true, value: 1000, color: colors.white },
+  wK: { id: 6, dirs: kiDir, slide: false, value: 50000, color: colors.white },
+  bP: { id: 7, value: 100, color: colors.black },
+  bN: { id: 8, dirs: knDir, slide: false, value: 325, color: colors.black },
+  bB: { id: 9, dirs: biDir, slide: true, value: 325, color: colors.black },
+  bR: { id: 10, dirs: rkDir, slide: true, value: 550, color: colors.black },
+  bQ: { id: 11, dirs: qnDir, slide: true, value: 1000, color: colors.black },
+  bK: { id: 12, dirs: kiDir, slide: false, value: 50000, color: colors.black },
+};
 
-const figCol = [
-  //color for particular figure
-  0,
-  colors.white,
-  colors.white,
-  colors.white,
-  colors.white,
-  colors.white,
-  colors.white,
-  colors.black,
-  colors.black,
-  colors.black,
-  colors.black,
-  colors.black,
-  colors.black,
-];
+const size64 = 8;
+const gridSqNum = 120;
+const maxFigNum = 10;
+const typesOfFigures = 12;
+const index120FirstSq = 21;
+const index120FirstOffBoard = 99;
+const width120 = 10;
+const indexOffBoard = [-2, -1, 8, 9];
 
 const maxDepth = 64; //for search
 const maxGameMoves = 2048;
@@ -126,7 +83,7 @@ const inf = 30000;
 const mate = 29000;
 const pvEntries = 10000;
 
-const kings = [figs.wK, figs.bK];
+const kings = [figs.wK.id, figs.bK.id];
 
 const gameController = {
   engineSide: colors.both,
@@ -134,119 +91,93 @@ const gameController = {
   gameOver: false,
 };
 
+const grid = {};
+
 const initGrid = () => {
-  const res = {};
   for (let i = -2; i < 10; i++) {
-    res[i] = {};
+    grid[i] = {};
     for (let j = -2; j < 10; j++) {
-      if (
-        i === -2 ||
-        i === -1 ||
-        i === 8 ||
-        i === 9 ||
-        j === -2 ||
-        j === -1 ||
-        j === 8 ||
-        j === 9
-      ) {
-        res[i][j] = figs.offBoard;
+      if (indexOffBoard.includes(i) || indexOffBoard.includes(j)) {
+        grid[i][j] = figs.offBoard;
       } else {
-        res[i][j] = figs.empty;
+        grid[i][j] = figs.empty;
       }
     }
   }
-  res[0] = {
+  grid[0] = {
+    //start row of black figures
     '-2': figs.offBoard,
     '-1': figs.offBoard,
-    0: figs.bR,
-    1: figs.bN,
-    2: figs.bB,
-    3: figs.bQ,
-    4: figs.bK,
-    5: figs.bB,
-    6: figs.bN,
-    7: figs.bR,
+    0: figs.bR.id,
+    1: figs.bN.id,
+    2: figs.bB.id,
+    3: figs.bQ.id,
+    4: figs.bK.id,
+    5: figs.bB.id,
+    6: figs.bN.id,
+    7: figs.bR.id,
     8: figs.offBoard,
     9: figs.offBoard,
   };
-  res[1] = {
+  grid[1] = {
+    //start row of black pawns
     '-2': figs.offBoard,
     '-1': figs.offBoard,
-    0: figs.bP,
-    1: figs.bP,
-    2: figs.bP,
-    3: figs.bP,
-    4: figs.bP,
-    5: figs.bP,
-    6: figs.bP,
-    7: figs.bP,
+    0: figs.bP.id,
+    1: figs.bP.id,
+    2: figs.bP.id,
+    3: figs.bP.id,
+    4: figs.bP.id,
+    5: figs.bP.id,
+    6: figs.bP.id,
+    7: figs.bP.id,
     8: figs.offBoard,
     9: figs.offBoard,
   };
-  res[6] = {
+  grid[6] = {
+    //start row of white pawns
     '-2': figs.offBoard,
     '-1': figs.offBoard,
-    0: figs.wP,
-    1: figs.wP,
-    2: figs.wP,
-    3: figs.wP,
-    4: figs.wP,
-    5: figs.wP,
-    6: figs.wP,
-    7: figs.wP,
+    0: figs.wP.id,
+    1: figs.wP.id,
+    2: figs.wP.id,
+    3: figs.wP.id,
+    4: figs.wP.id,
+    5: figs.wP.id,
+    6: figs.wP.id,
+    7: figs.wP.id,
     8: figs.offBoard,
     9: figs.offBoard,
   };
-  res[7] = {
+  grid[7] = {
+    //start row of white figures
     '-2': figs.offBoard,
     '-1': figs.offBoard,
-    0: figs.wR,
-    1: figs.wN,
-    2: figs.wB,
-    3: figs.wQ,
-    4: figs.wK,
-    5: figs.wB,
-    6: figs.wN,
-    7: figs.wR,
+    0: figs.wR.id,
+    1: figs.wN.id,
+    2: figs.wB.id,
+    3: figs.wQ.id,
+    4: figs.wK.id,
+    5: figs.wB.id,
+    6: figs.wN.id,
+    7: figs.wR.id,
     8: figs.offBoard,
     9: figs.offBoard,
   };
-  return res;
 };
 
-const grid = initGrid();
-
-const logGrid = () => {
-  console.log('-----------GRID----------');
-  console.log('  0  1  2  3  4  5  6  7');
-  for (const i in grid) {
-    if (i === '-2' || i === '-1' || i === '8' || i === '9') continue;
-    const row = grid[i];
-    console.log(
-      i,
-      revFigs[row[0]],
-      revFigs[row[1]],
-      revFigs[row[2]],
-      revFigs[row[3]],
-      revFigs[row[4]],
-      revFigs[row[5]],
-      revFigs[row[6]],
-      revFigs[row[7]]
-    );
-  }
-  console.log('-------------------------');
-};
+initGrid(); //object of board
 
 const createSquares = block => {
   //defining divs in container
   let light = 0;
-  for (let i = 0; i < size; i++) {
+  for (let i = 0; i < size64; i++) {
     light ^= 1;
-    for (let j = 0; j < size; j++) {
+    for (let j = 0; j < size64; j++) {
       const div = document.createElement('div');
-      div.id = 'sq_' + i + j;
+      div.id = `sq_${i}_${j}`;
       div.className = `square rank${i} file${j}`;
-      if (light === 1) div.className += ' light';
+      if (light) div.className += ' light';
       else div.className += ' dark';
       block.append(div);
       light ^= 1;
@@ -256,7 +187,7 @@ const createSquares = block => {
 
 const clearSquares = block => {
   const figures = block.querySelectorAll('.figure');
-  if (figures.length === 0) return;
+  if (!figures.length) return;
   for (const figure of figures) {
     block.removeChild(figure);
   }
@@ -264,9 +195,9 @@ const clearSquares = block => {
 
 const fillFigures = block => {
   clearSquares(block);
-  for (let i = 0; i < size; i++) {
-    for (let j = 0; j < size; j++) {
-      if (grid[i][j] >= figs.wP && grid[i][j] <= figs.bK) {
+  for (let i = 0; i < size64; i++) {
+    for (let j = 0; j < size64; j++) {
+      if (grid[i][j] >= figs.wP.id && grid[i][j] <= figs.bK.id) {
         const img = new Image();
         img.src = `icons/${grid[i][j]}.png`;
         img.className = `figure rank${i} file${j}`;
@@ -281,18 +212,26 @@ const createBoard = block => {
   fillFigures(block);
 };
 
-const figIndex = (fig, figNum) => fig * 10 + figNum;
+const figIndex = (fig, figNum) => fig * width120 + figNum;
 const notEmptyMove = (...args) => args.flat().every(el => el !== -1);
 const noSq = () => [-1, -1];
-const sq120 = sq => sq[0] * 10 + sq[1] + 21;
-const mirror = arr => [7 - arr[0], arr[1]];
+const sq120 = sq => sq[0] * width120 + sq[1] + index120FirstSq;
+const mirror = arr => [size64 - 1 - arr[0], arr[1]];
 
+const getKeyById = (obj, id) => {
+  const entries = Object.entries(obj);
+  for (const [key, value] of entries) {
+    if (value.id === id || value === id) return key;
+  }
+  console.log(id, entries);
+  throw new Error('not found key');
+};
 const arrsEqual = (...arrs) => {
-  if (arrs.length === 1) return new Error('at least 2 arguments requied');
+  if (arrs.length < 2) return new Error('at least 2 arguments requied');
   for (const arr of arrs) {
     if (arr.length !== arrs[0].length) return false;
   }
-  for (const i in arrs[0]) {
+  for (let i = 0; i < arrs[0].length; i++) {
     if (arrs.some(el => el[i] !== arrs[0][i])) return false;
   }
   return true;
@@ -302,7 +241,9 @@ const checkObjectsEqual = (a, b) => {
   for (const i in a) {
     if (typeof a[i] === 'object') {
       if (!checkObjectsEqual(a[i], b[i])) return false;
-    } else if (a[i] !== b[i]) return false;
+    } else if (a[i] !== b[i]) {
+      return false;
+    }
   }
   return true;
 };
@@ -364,8 +305,8 @@ const transformCastlePerm = obj => {
   return res;
 };
 const transformEnPas = arr => {
-  let res = 99;
-  if (notEmptyMove(arr)) res = arr[0] * 10 + arr[1] + 21;
+  let res = index120FirstOffBoard;
+  if (notEmptyMove(arr)) res = arr[0] * width120 + arr[1] + index120FirstSq;
   return res;
 };
 
