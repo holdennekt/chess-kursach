@@ -67,47 +67,64 @@ const genPosKey = () => {
   return finalKey;
 };
 
-const knBiRkKi = (sq, side, obj) => {
-  let knight, bishop, rook, queen, king;
+const isAttackedByKnight = (sq, side) => {
+  let knight;
+  const i = sq[0];
+  const j = sq[1];
+  if (side === colors.white) knight = figs.wN.id;
+  else knight = figs.bN.id;
+  for (const dir of knDir) {
+    if (grid[i + dir[0]][j + dir[1]] === knight) {
+      return true;
+    }
+  }
+  return false;
+};
+
+const isAttackedByBishop = (sq, side) => {
+  let bishop, queen;
   const i = sq[0];
   const j = sq[1];
   if (side === colors.white) {
-    knight = figs.wN.id;
     bishop = figs.wB.id;
-    rook = figs.wR.id;
     queen = figs.wQ.id;
-    king = figs.wK.id;
   } else {
-    knight = figs.bN.id;
     bishop = figs.bB.id;
-    rook = figs.bR.id;
     queen = figs.bQ.id;
-    king = figs.bK.id;
-  }
-  for (const dir of knDir) {
-    if (obj[i + dir[0]][j + dir[1]] === knight) {
-      return true;
-    }
   }
   for (const dir of biDir) {
     let tempI = i + dir[0],
       tempJ = j + dir[1];
-    while (obj[tempI][tempJ] !== figs.offBoard) {
-      if (obj[tempI][tempJ] !== figs.empty) {
-        if (obj[tempI][tempJ] === bishop || obj[tempI][tempJ] === queen) {
+    while (grid[tempI][tempJ] !== figs.offBoard) {
+      if (grid[tempI][tempJ] !== figs.empty) {
+        if (grid[tempI][tempJ] === bishop || grid[tempI][tempJ] === queen) {
           return true;
         }
         break;
       }
       (tempI += dir[0]), (tempJ += dir[1]);
     }
+  }
+  return false;
+};
+
+const isAttackedByRook = (sq, side) => {
+  let rook, queen;
+  const i = sq[0];
+  const j = sq[1];
+  if (side === colors.white) {
+    rook = figs.wR.id;
+    queen = figs.wQ.id;
+  } else {
+    rook = figs.bR.id;
+    queen = figs.bQ.id;
   }
   for (const dir of rkDir) {
     let tempI = i + dir[0],
       tempJ = j + dir[1];
-    while (obj[tempI][tempJ] !== figs.offBoard) {
-      if (obj[tempI][tempJ] !== figs.empty) {
-        if (obj[tempI][tempJ] === rook || obj[tempI][tempJ] === queen) {
+    while (grid[tempI][tempJ] !== figs.offBoard) {
+      if (grid[tempI][tempJ] !== figs.empty) {
+        if (grid[tempI][tempJ] === rook || grid[tempI][tempJ] === queen) {
           return true;
         }
         break;
@@ -115,8 +132,17 @@ const knBiRkKi = (sq, side, obj) => {
       (tempI += dir[0]), (tempJ += dir[1]);
     }
   }
+  return false;
+};
+
+const isAttackedByKing = (sq, side) => {
+  let king;
+  const i = sq[0];
+  const j = sq[1];
+  if (side === gameBoard.side) king = figs.wK.id;
+  else king = figs.bK.id;
   for (const dir of kiDir) {
-    if (obj[i + dir[0]][j + dir[1]] === king) {
+    if (grid[i + dir[0]][j + dir[1]] === king) {
       return true;
     }
   }
@@ -124,8 +150,8 @@ const knBiRkKi = (sq, side, obj) => {
 };
 
 const isSqAttackedBySide = (sq, side, obj = grid) => {
-  const i = sq[0],
-    j = sq[1];
+  const i = sq[0];
+  const j = sq[1];
   if (side === colors.white) {
     if (obj[i + 1][j - 1] === figs.wP.id || obj[i + 1][j + 1] === figs.wP.id) {
       return true;
@@ -136,7 +162,12 @@ const isSqAttackedBySide = (sq, side, obj = grid) => {
   ) {
     return true;
   }
-  return knBiRkKi([i, j], side, obj);
+  const knight = isAttackedByKnight([i, j], side);
+  const bishopQueen = isAttackedByBishop([i, j], side);
+  const rookQueen = isAttackedByRook([i, j], side);
+  const king = isAttackedByKing([i, j], side);
+  if (knight || bishopQueen || rookQueen || king) return true;
+  return false;
 };
 
 const resetBoard = () => {

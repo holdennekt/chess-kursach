@@ -168,7 +168,19 @@ const initGrid = () => {
 
 initGrid(); //object of board
 
-const createSquares = block => {
+const logGrid = () => {
+  for (let i = 0; i < 8; i++) {
+    let line = i + ' ';
+    for (let j = 0; j < 8; j++) {
+      let key = getKeyById(figs, grid[i][j]);
+      if (key === 'empty') line += '.  ';
+      else line += key + ' ';
+    }
+    console.log(line);
+  }
+};
+
+const createSquares = (block) => {
   //defining divs in container
   let light = 0;
   for (let i = 0; i < size64; i++) {
@@ -185,7 +197,7 @@ const createSquares = block => {
   }
 };
 
-const clearSquares = block => {
+const clearSquares = (block) => {
   const figures = block.querySelectorAll('.figure');
   if (!figures.length) return;
   for (const figure of figures) {
@@ -193,7 +205,7 @@ const clearSquares = block => {
   }
 };
 
-const fillFigures = block => {
+const fillFigures = (block) => {
   clearSquares(block);
   for (let i = 0; i < size64; i++) {
     for (let j = 0; j < size64; j++) {
@@ -207,16 +219,16 @@ const fillFigures = block => {
   }
 };
 
-const createBoard = block => {
+const createBoard = (block) => {
   createSquares(block);
   fillFigures(block);
 };
 
 const figIndex = (fig, figNum) => fig * width120 + figNum;
-const notEmptyMove = (...args) => args.flat().every(el => el !== -1);
+const notEmptyMove = (...args) => args.flat().every((el) => el !== -1);
 const noSq = () => [-1, -1];
-const sq120 = sq => sq[0] * width120 + sq[1] + index120FirstSq;
-const mirror = arr => [size64 - 1 - arr[0], arr[1]];
+const sq120 = (sq) => sq[0] * width120 + sq[1] + index120FirstSq;
+const mirror = (arr) => [size64 - 1 - arr[0], arr[1]];
 
 const getKeyById = (obj, id) => {
   const entries = Object.entries(obj);
@@ -232,7 +244,7 @@ const arrsEqual = (...arrs) => {
     if (arr.length !== arrs[0].length) return false;
   }
   for (let i = 0; i < arrs[0].length; i++) {
-    if (arrs.some(el => el[i] !== arrs[0][i])) return false;
+    if (arrs.some((el) => el[i] !== arrs[0][i])) return false;
   }
   return true;
 };
@@ -247,7 +259,7 @@ const checkObjectsEqual = (a, b) => {
   }
   return true;
 };
-const cloneObj = obj => {
+const cloneObj = (obj) => {
   let clone;
   if (!Array.isArray(obj)) clone = {};
   else clone = [];
@@ -258,20 +270,20 @@ const cloneObj = obj => {
   }
   return clone;
 };
-const arr0 = n => {
+const arr0 = (n) => {
   const res = [];
   for (let i = 0; i < n; i++) res.push(0);
   return res;
 };
-const arrPvTable = n => {
+const arrPvTable = (n) => {
   const res = [];
   for (let i = 0; i < n; i++) {
     res[i] = { move: emptyMove(), posKey: 0 };
   }
   return res;
 };
-const arr = n => new Array(n);
-const arrHistory = n => {
+
+const arrHistory = (n) => {
   const res = [];
   for (let i = 0; i < n; i++) {
     res[i] = {
@@ -289,22 +301,22 @@ const arrHistory = n => {
   }
   return res;
 };
-const arrSearchKillers = n => {
+const arrSearchKillers = (n) => {
   const res = [];
   for (let i = 0; i < n; i++) {
     res[i] = emptyMove();
   }
   return res;
 };
-const transformCastlePerm = obj => {
+const transformCastlePerm = (obj) => {
   let res = 0;
-  if (obj.whiteKSide) res += 1;
-  if (obj.whiteQSide) res += 2;
-  if (obj.blackKSide) res += 4;
-  if (obj.blackQSide) res += 8;
+  if (obj.whiteKSide) res += 1; //2^0
+  if (obj.whiteQSide) res += 2; //2^1
+  if (obj.blackKSide) res += 4; //2^2
+  if (obj.blackQSide) res += 8; //2^3
   return res;
 };
-const transformEnPas = arr => {
+const transformEnPas = (arr) => {
   let res = index120FirstOffBoard;
   if (notEmptyMove(arr)) res = arr[0] * width120 + arr[1] + index120FirstSq;
   return res;

@@ -47,6 +47,46 @@ const moveFig = (from, to, obj = gameBoard, board = grid) => {
   }
 };
 
+const checkEnPas = (move, mode = 'makeMove') => {
+  if (move.flag.enPas) {
+    const to = move.to;
+    if (mode === 'makeMove') {
+      if (gameBoard.side === colors.white) {
+        clearFig([to[0] + 1, to[1]]);
+      } else {
+        clearFig([to[0] - 1, to[1]]);
+      }
+    }
+    else if (mode === 'takeMove') {
+      if (gameBoard.side === colors.white) {
+        addFig([to[0] + 1, to[1]], figs.bP.id);
+      } else {
+        addFig([to[0] - 1, to[1]], figs.wP.id);
+      }
+    }
+  }
+};
+
+const checkPawnStart = move => {
+  const from = move.from;
+  const isPawn =
+    grid[from[0]][from[1]] === figs.wP.id ||
+    grid[from[0]][from[1]] === figs.bP.id;
+  if (isPawn) {
+    gameBoard.fiftyMove = 0;
+    if (move.flag.pawnStart) {
+      if (gameBoard.side === colors.white) {
+        gameBoard.enPas[0] = from[0] - 1;
+        gameBoard.enPas[1] = from[1];
+      } else {
+        gameBoard.enPas[0] = from[0] + 1;
+        gameBoard.enPas[1] = from[1];
+      }
+      hashEnPassant();
+    }
+  }
+}
+
 const updateCastlePerm = (from, to, obj = gameBoard) => {
   if (arrsEqual(from, [0, 0]) || arrsEqual(to, [0, 0])) {
     obj.castlePerm.blackQSide = false;
@@ -71,25 +111,21 @@ const updateCastlePerm = (from, to, obj = gameBoard) => {
 };
 
 const checkCastling = (castling, dir = 'straight') => {
-  switch (castling) {
-  case '':
-    break;
-  case 'whiteKSide':
+  if (castling === 'whiteKSide') {
     if (dir === 'straight') moveFig([7, 7], [7, 5]);
     else moveFig([7, 5], [7, 7]);
-    break;
-  case 'whiteQSide':
+  }
+  else if (castling === 'whiteQSide') {
     if (dir === 'straight') moveFig([7, 0], [7, 3]);
     else moveFig([7, 3], [7, 0]);
-    break;
-  case 'blackKSide':
+  }
+  else if (castling === 'blackKSide') {
     if (dir === 'straight') moveFig([0, 7], [0, 5]);
     else moveFig([0, 5], [0, 7]);
-    break;
-  case 'blackQSide':
+  }
+  else if (castling === 'blackQSide') {
     if (dir === 'straight') moveFig([0, 0], [0, 3]);
     else moveFig([0, 3], [0, 0]);
-    break;
   }
 };
 
@@ -102,9 +138,8 @@ const updateGameBoard = () => {
 const takeMove = () => {
   gameBoard.hisPly--, gameBoard.ply--;
   const move = gameBoard.history[gameBoard.hisPly].move;
-  const from = move.from,
-    to = move.to;
-
+  const from = move.from;
+  const to = move.to;
   if (!arrsEqual(gameBoard.enPas, noSq())) hashEnPassant();
   hashCastling();
   updateGameBoard();
@@ -112,18 +147,10 @@ const takeMove = () => {
   hashCastling();
   gameBoard.side ^= 1;
   hashSide();
-  if (move.flag.enPas) {
-    if (gameBoard.side === colors.white) {
-      addFig([to[0] + 1, to[1]], figs.bP.id);
-    } else {
-      addFig([to[0] - 1, to[1]], figs.wP.id);
-    }
-  }
+  checkEnPas(move, 'takeMove');
   checkCastling(move.flag.castling, 'reverse');
   moveFig(to, from);
-  if (move.captured !== figs.empty) {
-    addFig(to, move.captured);
-  }
+  if (move.captured !== figs.empty) addFig(to, move.captured);
   if (move.promoted !== figs.empty) {
     clearFig(from);
     const key = getKeyById(figs, move.promoted);
@@ -143,16 +170,10 @@ const updateHistory = move => {
 
 const makeMove = move => {
   const side = gameBoard.side;
-  const from = move.from,
-    to = move.to;
+  const from = move.from;
+  const to = move.to;
   gameBoard.history[gameBoard.hisPly].posKey = gameBoard.posKey;
-  if (move.flag.enPas) {
-    if (side === colors.white) {
-      clearFig([to[0] + 1, to[1]]);
-    } else {
-      clearFig([to[0] - 1, to[1]]);
-    }
-  }
+  checkEnPas(move, 'makeMove');
   checkCastling(move.flag.castling);
   if (!arrsEqual(gameBoard.enPas, noSq())) hashEnPassant();
   hashCastling();
@@ -165,24 +186,8 @@ const makeMove = move => {
     clearFig(to);
     gameBoard.fiftyMove = 0;
   }
-  gameBoard.hisPly++;
-  gameBoard.ply++;
-  const isPawn =
-    grid[from[0]][from[1]] === figs.wP.id ||
-    grid[from[0]][from[1]] === figs.bP.id;
-  if (isPawn) {
-    gameBoard.fiftyMove = 0;
-    if (move.flag.pawnStart) {
-      if (side === colors.white) {
-        gameBoard.enPas[0] = from[0] - 1;
-        gameBoard.enPas[1] = from[1];
-      } else {
-        gameBoard.enPas[0] = from[0] + 1;
-        gameBoard.enPas[1] = from[1];
-      }
-      hashEnPassant();
-    }
-  }
+  gameBoard.hisPly++, gameBoard.ply++;
+  checkPawnStart(move);
   moveFig(from, to);
   if (move.promoted !== figs.empty) {
     clearFig(to);

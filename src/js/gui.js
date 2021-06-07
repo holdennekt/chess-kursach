@@ -128,6 +128,26 @@ const addGuiFig = (sq, fig) => {
   document.querySelector('#container').append(img);
 };
 
+const ifCastling = move => {
+  const castling = move.flag.castling;
+  if (castling === 'whiteKSide') {
+    removeGuiFig([7, 7]);
+    addGuiFig([7, 5], figs.wR.id);
+  }
+  else if (castling === 'whiteQSide') {
+    removeGuiFig([7, 0]);
+    addGuiFig([7, 3], figs.wR.id);
+  }
+  else if (castling === 'blackKSide') {
+    removeGuiFig([0, 7]);
+    addGuiFig([0, 5], figs.bR.id);
+  }
+  else if (castling === 'blackQSide') {
+    removeGuiFig([0, 0]);
+    addGuiFig([0, 3], figs.bR.id);
+  }
+};
+
 const moveGuiFig = move => {
   if (move.flag.enPas) {
     let epRemove;
@@ -142,26 +162,7 @@ const moveGuiFig = move => {
   const figOnSq = document.querySelectorAll(str)[0];
   figOnSq.classList.remove(`rank${move.from[0]}`, `file${move.from[1]}`);
   figOnSq.classList.add(`rank${move.to[0]}`, `file${move.to[1]}`);
-  switch (move.flag.castling) {
-  case '':
-    break;
-  case 'whiteKSide':
-    removeGuiFig([7, 7]);
-    addGuiFig([7, 5], figs.wR.id);
-    break;
-  case 'whiteQSide':
-    removeGuiFig([7, 0]);
-    addGuiFig([7, 3], figs.wR.id);
-    break;
-  case 'blackKSide':
-    removeGuiFig([0, 7]);
-    addGuiFig([0, 5], figs.bR.id);
-    break;
-  case 'blackQSide':
-    removeGuiFig([0, 0]);
-    addGuiFig([0, 3], figs.bR.id);
-    break;
-  }
+  ifCastling(move);
   if (move.promoted !== figs.empty) {
     removeGuiFig(move.to);
     addGuiFig(move.to, move.promoted);

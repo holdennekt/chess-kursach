@@ -49,19 +49,11 @@ const quiescence = (alpha, beta) => {
   if (search.nodes % 2048 === 0) checkTime();
   search.nodes++;
   const statement = isRepetition() || gameBoard.fiftyMove >= 100;
-  if (statement && gameBoard.ply !== 0) {
-    return 0;
-  }
-  if (gameBoard.ply > maxDepth - 1) {
-    return evalPosition();
-  }
+  if (statement && gameBoard.ply !== 0) return 0;
+  if (gameBoard.ply > maxDepth - 1) return evalPosition();
   let score = evalPosition();
-  if (score >= beta) {
-    return beta;
-  }
-  if (score > alpha) {
-    alpha = score;
-  }
+  if (score >= beta) return beta;
+  if (score > alpha) alpha = score;
   generateMoves();
   let legal = 0,
     bestMove = emptyMove();
@@ -88,9 +80,7 @@ const quiescence = (alpha, beta) => {
       bestMove = move;
     }
   }
-  if (alpha !== oldAlpha) {
-    storePvMove(bestMove);
-  }
+  if (alpha !== oldAlpha) storePvMove(bestMove);
   return alpha;
 };
 
@@ -105,19 +95,32 @@ const searchPvMove = pvMove => {
   return -1;
 };
 
-const alphaBeta = (alpha, beta, depth) => {
-  if (depth <= 0) {
-    return quiescence(alpha, beta);
+const cutOff = (legal, move) => {
+  if (legal === 1) search.failHighFirst++;
+  search.failHigh++;
+  if (move.captured === 0) {
+    gameBoard.searchKillers[maxDepth + gameBoard.ply] =
+      gameBoard.searchKillers[gameBoard.ply];
+    gameBoard.searchKillers[gameBoard.ply] = move;
   }
+};
+
+const storeSearchHistory = (move, depth) => {
+  if (move.captured === 0) {
+    const from = move.from;
+    const to = move.to;
+    const index = grid[from[0]][from[1]] * gridSqNum + sq120(mirror(to));
+    gameBoard.searchHistory[index] += depth * depth;
+  }
+};
+
+const alphaBeta = (alpha, beta, depth) => {
+  if (depth <= 0) return quiescence(alpha, beta);
   if (search.nodes % 2048 === 0) checkTime();
   search.nodes++;
   const statement = isRepetition() || gameBoard.fiftyMove >= 100;
-  if (statement && gameBoard.ply !== 0) {
-    return 0;
-  }
-  if (gameBoard.ply > maxDepth - 1) {
-    return evalPosition();
-  }
+  if (statement && gameBoard.ply !== 0) return 0;
+  if (gameBoard.ply > maxDepth - 1) return evalPosition();
   const inCheck = isSqAttackedBySide(
     gameBoard.figList[figIndex(kings[gameBoard.side], 0)],
     gameBoard.side ^ 1
@@ -143,32 +146,19 @@ const alphaBeta = (alpha, beta, depth) => {
     if (search.stop) return 0;
     if (score > alpha) {
       if (score >= beta) {
-        if (legal === 1) search.failHighFirst++;
-        search.failHigh++;
-        if (move.captured === 0) {
-          gameBoard.searchKillers[maxDepth + gameBoard.ply] =
-            gameBoard.searchKillers[gameBoard.ply];
-          gameBoard.searchKillers[gameBoard.ply] = move;
-        }
+        cutOff(legal, move);
         return beta;
       }
-      if (move.captured === 0) {
-        const from = move.from,
-          to = move.to;
-        const index = grid[from[0]][from[1]] * gridSqNum + sq120(mirror(to));
-        gameBoard.searchHistory[index] += depth * depth;
-      }
+      storeSearchHistory(move, depth);
       alpha = score;
       bestMove = move;
     }
   }
-  if (legal === 0) {
+  if (!legal) {
     if (inCheck) return -mate + gameBoard.ply;
     return 0;
   }
-  if (alpha !== oldAlpha) {
-    storePvMove(bestMove);
-  }
+  if (alpha !== oldAlpha) storePvMove(bestMove);
   return alpha;
 };
 

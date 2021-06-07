@@ -104,11 +104,12 @@ const whitePawns = () => {
       addWhitePawnMove(sq, [sq[0] - 1, sq[1] + 1], grid[sq[0] - 1][sq[1] + 1]);
     }
     if (!arrsEqual(gameBoard.enPas, noSq())) {
-      if (arrsEqual(gameBoard.enPas, [sq[0] - 1, sq[1] - 1])) {
-        addMove(sq, [sq[0] - 1, sq[1] - 1], figs.empty, figs.empty, Flag(true));
+      const i = sq[0] - 1;
+      if (arrsEqual(gameBoard.enPas, [i, sq[1] - 1])) {
+        addMove(sq, [i, sq[1] - 1], figs.empty, figs.empty, Flag(true));
       }
       if (arrsEqual(gameBoard.enPas, [sq[0] - 1, sq[1] + 1])) {
-        addMove(sq, [sq[0] - 1, sq[1] + 1], figs.empty, figs.empty, Flag(true));
+        addMove(sq, [i, sq[1] + 1], figs.empty, figs.empty, Flag(true));
       }
     }
   }
@@ -145,11 +146,12 @@ const blackPawns = () => {
       addBlackPawnMove(sq, [sq[0] + 1, sq[1] + 1], grid[sq[0] + 1][sq[1] + 1]);
     }
     if (!arrsEqual(gameBoard.enPas, noSq())) {
-      if (arrsEqual(gameBoard.enPas, [sq[0] + 1, sq[1] - 1])) {
-        addMove(sq, [sq[0] + 1, sq[1] - 1], figs.empty, figs.empty, Flag(true));
+      const i = sq[0] + 1;
+      if (arrsEqual(gameBoard.enPas, [i, sq[1] - 1])) {
+        addMove(sq, [i, sq[1] - 1], figs.empty, figs.empty, Flag(true));
       }
       if (arrsEqual(gameBoard.enPas, [sq[0] + 1, sq[1] + 1])) {
-        addMove(sq, [sq[0] + 1, sq[1] + 1], figs.empty, figs.empty, Flag(true));
+        addMove(sq, [i, sq[1] + 1], figs.empty, figs.empty, Flag(true));
       }
     }
   }
