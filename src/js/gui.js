@@ -360,7 +360,7 @@ const checkAndSet = () => {
 
 const startSearch = () => {
   search.depth = maxDepth;
-  search.time = 2000;
+  search.time = 800;
   searchPosition();
   makeMove(search.best);
   moveGuiFig(search.best);

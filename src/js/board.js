@@ -139,7 +139,7 @@ const isAttackedByKing = (sq, side) => {
   let king;
   const i = sq[0];
   const j = sq[1];
-  if (side === gameBoard.side) king = figs.wK.id;
+  if (side === colors.white) king = figs.wK.id;
   else king = figs.bK.id;
   for (const dir of kiDir) {
     if (grid[i + dir[0]][j + dir[1]] === king) {
