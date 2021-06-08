@@ -87,9 +87,9 @@ const quiescence = (alpha, beta) => {
 const searchPvMove = (pvMove) => {
   const start = gameBoard.moveListStart[gameBoard.ply];
   const end = gameBoard.moveListStart[gameBoard.ply + 1];
-  if (!checkObjectsEqual(pvMove, emptyMove())) {
+  if (!objctsEqual(pvMove, emptyMove())) {
     for (let i = start; i < end; i++) {
-      if (checkObjectsEqual(gameBoard.moveList[i], pvMove)) return i;
+      if (objctsEqual(gameBoard.moveList[i], pvMove)) return i;
     }
   }
   return -1;

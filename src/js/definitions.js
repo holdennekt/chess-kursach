@@ -53,13 +53,13 @@ const colors = {
 const figs = {
   offBoard: -1,
   empty: 0,
-  wP: { id: 1, value: 100, color: colors.white },
+  wP: { id: 1, dir: [-1, 0], value: 100, color: colors.white },
   wN: { id: 2, dirs: knDir, slide: false, value: 325, color: colors.white },
   wB: { id: 3, dirs: biDir, slide: true, value: 325, color: colors.white },
   wR: { id: 4, dirs: rkDir, slide: true, value: 550, color: colors.white },
   wQ: { id: 5, dirs: qnDir, slide: true, value: 1000, color: colors.white },
   wK: { id: 6, dirs: kiDir, slide: false, value: 50000, color: colors.white },
-  bP: { id: 7, value: 100, color: colors.black },
+  bP: { id: 7, dir: [1, 0], value: 100, color: colors.black },
   bN: { id: 8, dirs: knDir, slide: false, value: 325, color: colors.black },
   bB: { id: 9, dirs: biDir, slide: true, value: 325, color: colors.black },
   bR: { id: 10, dirs: rkDir, slide: true, value: 550, color: colors.black },
@@ -67,7 +67,22 @@ const figs = {
   bK: { id: 12, dirs: kiDir, slide: false, value: 50000, color: colors.black },
 };
 
+const sqs = {
+  a1: [7, 0],
+  d1: [7, 3],
+  e1: [7, 4],
+  f1: [7, 5],
+  h1: [7, 7],
+  a8: [0, 0],
+  d8: [0, 3],
+  e8: [0, 4],
+  f8: [0, 5],
+  h8: [0, 7],
+};
+
 const size64 = 8;
+const startIndex120 = -2;
+const endIndex120 = 10;
 const gridSqNum = 120;
 const maxFigNum = 10;
 const typesOfFigures = 12;
@@ -94,9 +109,9 @@ const gameController = {
 const grid = {};
 
 const initGrid = () => {
-  for (let i = -2; i < 10; i++) {
+  for (let i = startIndex120; i < endIndex120; i++) {
     grid[i] = {};
-    for (let j = -2; j < 10; j++) {
+    for (let j = startIndex120; j < endIndex120; j++) {
       if (indexOffBoard.includes(i) || indexOffBoard.includes(j)) {
         grid[i][j] = figs.offBoard;
       } else {
@@ -168,18 +183,6 @@ const initGrid = () => {
 
 initGrid(); //object of board
 
-const logGrid = () => {
-  for (let i = 0; i < 8; i++) {
-    let line = i + ' ';
-    for (let j = 0; j < 8; j++) {
-      const key = getKeyById(figs, grid[i][j]);
-      if (key === 'empty') line += '.  ';
-      else line += key + ' ';
-    }
-    console.log(line);
-  }
-};
-
 const createSquares = (block) => {
   //defining divs in container
   let light = 0;
@@ -248,11 +251,11 @@ const arrsEqual = (...arrs) => {
   }
   return true;
 };
-const checkObjectsEqual = (a, b) => {
+const objctsEqual = (a, b) => {
   if (a.length !== b.length) return false;
   for (const i in a) {
     if (typeof a[i] === 'object') {
-      if (!checkObjectsEqual(a[i], b[i])) return false;
+      if (!objctsEqual(a[i], b[i])) return false;
     } else if (a[i] !== b[i]) {
       return false;
     }
@@ -330,16 +333,16 @@ const Flag = (enPas = false, pawnStart = false, castling = '') => ({
 const emptyMove = () => ({
   from: noSq(),
   to: noSq(),
-  captured: -1,
-  promoted: -1,
+  captured: figs.offBoard,
+  promoted: figs.offBoard,
   flag: Flag(),
 });
 
 const rand32 = () =>
-  (Math.floor(Math.random() * 225 + 1) << 23) |
-  (Math.floor(Math.random() * 225 + 1) << 16) |
-  (Math.floor(Math.random() * 225 + 1) << 8) |
-  Math.floor(Math.random() * 225 + 1);
+  (Math.floor(Math.random() * 255 + 1) << 23) |
+  (Math.floor(Math.random() * 255 + 1) << 16) |
+  (Math.floor(Math.random() * 255 + 1) << 8) |
+  Math.floor(Math.random() * 255 + 1);
 
 const initFigKeys = () => {
   const res = [];

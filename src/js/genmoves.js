@@ -39,9 +39,9 @@ const addMove = (from, to, captured = 0, promoted = 0, flag = Flag()) => {
     gameBoard.moveScores[index] = 0;
     const moveKiller1 = gameBoard.searchKillers[gameBoard.ply];
     const moveKiller2 = gameBoard.searchKillers[gameBoard.ply + maxDepth];
-    if (checkObjectsEqual(move, moveKiller1)) {
+    if (objctsEqual(move, moveKiller1)) {
       gameBoard.moveScores[index] = killerBonus;
-    } else if (checkObjectsEqual(move, moveKiller2)) {
+    } else if (objctsEqual(move, moveKiller2)) {
       gameBoard.moveScores[index] = killerBonus2;
     } else {
       const temp = grid[from[0]][from[1]] * gridSqNum + sq120(mirror(to));
@@ -51,154 +51,116 @@ const addMove = (from, to, captured = 0, promoted = 0, flag = Flag()) => {
   gameBoard.moveListStart[gameBoard.ply + 1]++;
 };
 
-const addWhitePawnMove = (from, to, captured = figs.empty) => {
-  if (from[0] === 1) {
-    addMove(from, to, captured, figs.wQ.id);
-    addMove(from, to, captured, figs.wR.id);
-    addMove(from, to, captured, figs.wB.id);
-    addMove(from, to, captured, figs.wN.id);
+const addPawnMove = (color, from, to, captured = figs.empty) => {
+  let promI, queen, rook, bishop, knight;
+  if (color === colors.white) {
+    promI = 1;
+    queen = figs.wQ.id;
+    rook = figs.wR.id;
+    bishop = figs.wB.id;
+    knight = figs.wN.id;
+  } else {
+    promI = 6;
+    queen = figs.bQ.id;
+    rook = figs.bR.id;
+    bishop = figs.bB.id;
+    knight = figs.bN.id;
+  }
+  if (from[0] === promI) {
+    addMove(from, to, captured, queen);
+    addMove(from, to, captured, rook);
+    addMove(from, to, captured, bishop);
+    addMove(from, to, captured, knight);
   } else {
     addMove(from, to, captured);
   }
 };
 
-const addBlackPawnMove = (from, to, captured = figs.empty) => {
-  if (from[0] === 6) {
-    addMove(from, to, captured, figs.bQ.id);
-    addMove(from, to, captured, figs.bR.id);
-    addMove(from, to, captured, figs.bB.id);
-    addMove(from, to, captured, figs.bN.id);
+const addPawnCaptureMoves = (sq, capI, color) => {
+  let key = getKeyById(figs, grid[capI][sq[1] - 1]);
+  let statement =
+    grid[capI][sq[1] - 1] > figs.empty && (figs[key].color === color) ^ 1;
+  if (statement) {
+    addPawnMove(color, sq, [capI, sq[1] - 1], grid[capI][sq[1] - 1]);
+  }
+  key = getKeyById(figs, grid[capI][sq[1] + 1]);
+  statement =
+    grid[capI][sq[1] + 1] > figs.empty && (figs[key].color === color) ^ 1;
+  if (statement) {
+    addPawnMove(color, sq, [capI, sq[1] + 1], grid[capI][sq[1] + 1]);
+  }
+};
+
+const generatePawnMoves = (color) => {
+  let fig, dir, startI;
+  if (color === colors.white) {
+    fig = figs.wP.id;
+    dir = figs.wP.dir[0];
+    startI = 6;
   } else {
-    addMove(from, to, captured);
+    fig = figs.bP.id;
+    dir = figs.bP.dir[0];
+    startI = 1;
   }
-};
-
-const whitePawns = () => {
-  const figType = figs.wP.id;
-  for (let figNum = 0; figNum < gameBoard.figNum[figType]; figNum++) {
-    const sq = gameBoard.figList[figIndex(figType, figNum)];
-    if (grid[sq[0] - 1][sq[1]] === figs.empty) {
-      addWhitePawnMove(sq, [sq[0] - 1, sq[1]]);
-      if (sq[0] === 6 && grid[sq[0] - 2][sq[1]] === figs.empty) {
-        addMove(
-          sq,
-          [sq[0] - 2, sq[1]],
-          figs.empty,
-          figs.empty,
-          Flag(false, true)
-        );
+  for (let figNum = 0; figNum < gameBoard.figNum[fig]; figNum++) {
+    const sq = gameBoard.figList[figIndex(fig, figNum)];
+    if (grid[sq[0] + dir][sq[1]] === figs.empty) {
+      addPawnMove(color, sq, [sq[0] + dir, sq[1]]);
+      const toSq = [sq[0] + dir * 2, sq[1]];
+      if (sq[0] === startI && grid[toSq[0]][toSq[1]] === figs.empty) {
+        addMove(sq, toSq, figs.empty, figs.empty, Flag(false, true));
       }
     }
-    let key = getKeyById(figs, grid[sq[0] - 1][sq[1] - 1]);
-    if (
-      grid[sq[0] - 1][sq[1] - 1] > figs.empty &&
-      figs[key].color === colors.black
-    ) {
-      addWhitePawnMove(sq, [sq[0] - 1, sq[1] - 1], grid[sq[0] - 1][sq[1] - 1]);
-    }
-    key = getKeyById(figs, grid[sq[0] - 1][sq[1] + 1]);
-    if (
-      grid[sq[0] - 1][sq[1] + 1] > figs.empty &&
-      figs[key].color === colors.black
-    ) {
-      addWhitePawnMove(sq, [sq[0] - 1, sq[1] + 1], grid[sq[0] - 1][sq[1] + 1]);
-    }
+    const capI = sq[0] + dir;
+    addPawnCaptureMoves(sq, capI, color);
     if (!arrsEqual(gameBoard.enPas, noSq())) {
-      const i = sq[0] - 1;
-      if (arrsEqual(gameBoard.enPas, [i, sq[1] - 1])) {
-        addMove(sq, [i, sq[1] - 1], figs.empty, figs.empty, Flag(true));
+      if (arrsEqual(gameBoard.enPas, [capI, sq[1] - 1])) {
+        addMove(sq, [capI, sq[1] - 1], figs.empty, figs.empty, Flag(true));
       }
-      if (arrsEqual(gameBoard.enPas, [sq[0] - 1, sq[1] + 1])) {
-        addMove(sq, [i, sq[1] + 1], figs.empty, figs.empty, Flag(true));
+      if (arrsEqual(gameBoard.enPas, [capI, sq[1] + 1])) {
+        addMove(sq, [capI, sq[1] + 1], figs.empty, figs.empty, Flag(true));
       }
     }
   }
 };
 
-const blackPawns = () => {
-  const figType = figs.bP.id;
-  for (let figNum = 0; figNum < gameBoard.figNum[figType]; figNum++) {
-    const sq = gameBoard.figList[figIndex(figType, figNum)];
-    if (grid[sq[0] + 1][sq[1]] === figs.empty) {
-      addBlackPawnMove(sq, [sq[0] + 1, sq[1]]);
-      if (sq[0] === 1 && grid[sq[0] + 2][sq[1]] === figs.empty) {
-        addMove(
-          sq,
-          [sq[0] + 2, sq[1]],
-          figs.empty,
-          figs.empty,
-          Flag(false, true)
-        );
+const castlingKingSide = (rank, color, side) => {
+  if (gameBoard.castlePerm[color + 'KSide']) {
+    const tempJ = [5, 6];
+    if (tempJ.every((el) => grid[rank][el] === figs.empty)) {
+      const kingWay = [4, 5, 6];
+      if (kingWay.every((el) => !isSqAttackedBySide([rank, el], side ^ 1))) {
+        const flag = Flag(false, false, color + 'KSide');
+        addMove([rank, 4], [rank, 6], figs.empty, figs.empty, flag);
       }
     }
-    let key = getKeyById(figs, grid[sq[0] + 1][sq[1] - 1]);
-    if (
-      grid[sq[0] + 1][sq[1] - 1] > figs.empty &&
-      figs[key].color === colors.white
-    ) {
-      addBlackPawnMove(sq, [sq[0] + 1, sq[1] - 1], grid[sq[0] + 1][sq[1] - 1]);
-    }
-    key = getKeyById(figs, grid[sq[0] + 1][sq[1] + 1]);
-    if (
-      grid[sq[0] + 1][sq[1] + 1] > figs.empty &&
-      figs[key].color === colors.white
-    ) {
-      addBlackPawnMove(sq, [sq[0] + 1, sq[1] + 1], grid[sq[0] + 1][sq[1] + 1]);
-    }
-    if (!arrsEqual(gameBoard.enPas, noSq())) {
-      const i = sq[0] + 1;
-      if (arrsEqual(gameBoard.enPas, [i, sq[1] - 1])) {
-        addMove(sq, [i, sq[1] - 1], figs.empty, figs.empty, Flag(true));
-      }
-      if (arrsEqual(gameBoard.enPas, [sq[0] + 1, sq[1] + 1])) {
-        addMove(sq, [i, sq[1] + 1], figs.empty, figs.empty, Flag(true));
+  }
+};
+
+const castlingQueenSide = (rank, color, side) => {
+  if (gameBoard.castlePerm[color + 'QSide']) {
+    const tempJ = [1, 2, 3];
+    if (tempJ.every((el) => grid[rank][el] === figs.empty)) {
+      const kingWay = [2, 3, 4];
+      if (kingWay.every((el) => !isSqAttackedBySide([rank, el], side ^ 1))) {
+        const flag = Flag(false, false, color + 'QSide');
+        addMove([rank, 4], [rank, 2], figs.empty, figs.empty, flag);
       }
     }
   }
 };
 
 const castling = (side) => {
-  let i, color;
-  if (side === colors.white) (i = 7), (color = 'white');
-  else (i = 0), (color = 'black');
-  if (gameBoard.castlePerm[color + 'KSide']) {
-    if (grid[i][5] === figs.empty && grid[i][6] === figs.empty) {
-      if (
-        !isSqAttackedBySide([i, 4], colors[color] ^ 1) &&
-        !isSqAttackedBySide([i, 5], colors[color] ^ 1) &&
-        !isSqAttackedBySide([i, 6], colors[color] ^ 1)
-      ) {
-        addMove(
-          [i, 4],
-          [i, 6],
-          figs.empty,
-          figs.empty,
-          Flag(false, false, color + 'KSide')
-        );
-      }
-    }
+  let rank, color;
+  if (side === colors.white) {
+    rank = 7;
+    color = 'white';
+  } else {
+    rank = 0;
+    color = 'black';
   }
-  if (gameBoard.castlePerm[color + 'QSide']) {
-    if (
-      grid[i][1] === figs.empty &&
-      grid[i][2] === figs.empty &&
-      grid[i][3] === figs.empty
-    ) {
-      if (
-        !isSqAttackedBySide([i, 2], colors[color] ^ 1) &&
-        !isSqAttackedBySide([i, 3], colors[color] ^ 1) &&
-        !isSqAttackedBySide([i, 4], colors[color] ^ 1)
-      ) {
-        addMove(
-          [i, 4],
-          [i, 2],
-          figs.empty,
-          figs.empty,
-          Flag(false, false, color + 'QSide')
-        );
-      }
-    }
-  }
+  castlingKingSide(rank, color, side);
+  castlingQueenSide(rank, color, side);
 };
 
 const noSlideFigs = (col) => {
@@ -257,14 +219,11 @@ const slideFigs = (col) => {
 const generateMoves = () => {
   gameBoard.moveListStart[gameBoard.ply + 1] =
     gameBoard.moveListStart[gameBoard.ply];
-  if (gameBoard.side === colors.white) {
-    whitePawns();
-  } else {
-    blackPawns();
-  }
-  castling(gameBoard.side);
-  noSlideFigs(gameBoard.side);
-  slideFigs(gameBoard.side);
+  const side = gameBoard.side;
+  generatePawnMoves(side);
+  castling(side);
+  noSlideFigs(side);
+  slideFigs(side);
 };
 
 const moveExists = (move) => {
@@ -276,7 +235,7 @@ const moveExists = (move) => {
     if (!isMoveLegal(moveFound)) {
       continue;
     }
-    if (checkObjectsEqual(move, moveFound)) {
+    if (objctsEqual(move, moveFound)) {
       return true;
     }
   }

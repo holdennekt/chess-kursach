@@ -11,7 +11,7 @@ const probePvTable = () => {
 const getPvNum = (depth) => {
   let move = probePvTable();
   let count = 0;
-  while (!checkObjectsEqual(move, emptyMove()) && count < depth) {
+  while (!objctsEqual(move, emptyMove()) && count < depth) {
     if (moveExists(move)) {
       makeMove(move);
       gameBoard.pvArr[count++] = move;

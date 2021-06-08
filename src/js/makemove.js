@@ -87,41 +87,41 @@ const checkPawnStart = (move) => {
 };
 
 const updateCastlePerm = (from, to) => {
-  if (arrsEqual(from, [0, 0]) || arrsEqual(to, [0, 0])) {
+  if (arrsEqual(from, sqs.a8) || arrsEqual(to, sqs.a8)) {
     gameBoard.castlePerm.blackQSide = false;
   }
-  if (arrsEqual(from, [0, 4]) || arrsEqual(to, [0, 4])) {
+  if (arrsEqual(from, sqs.e8) || arrsEqual(to, sqs.e8)) {
     gameBoard.castlePerm.blackQSide = false;
     gameBoard.castlePerm.blackKSide = false;
   }
-  if (arrsEqual(from, [0, 7]) || arrsEqual(to, [0, 7])) {
+  if (arrsEqual(from, sqs.h8) || arrsEqual(to, sqs.h8)) {
     gameBoard.castlePerm.blackKSide = false;
   }
-  if (arrsEqual(from, [7, 0]) || arrsEqual(to, [7, 0])) {
+  if (arrsEqual(from, sqs.a1) || arrsEqual(to, sqs.a1)) {
     gameBoard.castlePerm.whiteQSide = false;
   }
-  if (arrsEqual(from, [7, 4]) || arrsEqual(to, [7, 4])) {
+  if (arrsEqual(from, sqs.e1) || arrsEqual(to, sqs.e1)) {
     gameBoard.castlePerm.whiteQSide = false;
     gameBoard.castlePerm.whiteKSide = false;
   }
-  if (arrsEqual(from, [7, 7]) || arrsEqual(to, [7, 7])) {
+  if (arrsEqual(from, sqs.h1) || arrsEqual(to, sqs.h1)) {
     gameBoard.castlePerm.whiteKSide = false;
   }
 };
 
 const checkCastling = (castling, mode = 'makeMove') => {
   if (castling === 'whiteKSide') {
-    if (mode === 'makeMove') moveFig([7, 7], [7, 5]);
-    else if (mode === 'takeMove') moveFig([7, 5], [7, 7]);
+    if (mode === 'makeMove') moveFig(sqs.h1, sqs.f1);
+    else if (mode === 'takeMove') moveFig(sqs.f1, sqs.h1);
   } else if (castling === 'whiteQSide') {
-    if (mode === 'makeMove') moveFig([7, 0], [7, 3]);
-    else if (mode === 'takeMove') moveFig([7, 3], [7, 0]);
+    if (mode === 'makeMove') moveFig(sqs.a1, sqs.d1);
+    else if (mode === 'takeMove') moveFig(sqs.d1, sqs.a1);
   } else if (castling === 'blackKSide') {
-    if (mode === 'makeMove') moveFig([0, 7], [0, 5]);
-    else if (mode === 'takeMove') moveFig([0, 5], [0, 7]);
+    if (mode === 'makeMove') moveFig(sqs.h8, sqs.f8);
+    else if (mode === 'takeMove') moveFig(sqs.f8, sqs.h8);
   } else if (castling === 'blackQSide') {
-    if (mode === 'makeMove') moveFig([0, 0], [0, 3]);
-    else if (mode === 'takeMove') moveFig([0, 3], [0, 0]);
+    if (mode === 'makeMove') moveFig(sqs.a8, sqs.d8);
+    else if (mode === 'takeMove') moveFig(sqs.d8, sqs.a8);
   }
 };
 

@@ -46,62 +46,31 @@ const rookTable = [
 
 const bishopPair = 40;
 
+figs.wP.table = pawnTable;
+figs.wN.table = knightTable;
+figs.wB.table = bishopTable;
+figs.wR.table = rookTable;
+figs.wQ.table = rookTable;
+figs.bP.table = pawnTable;
+figs.bN.table = knightTable;
+figs.bB.table = bishopTable;
+figs.bR.table = rookTable;
+figs.bQ.table = rookTable;
+
 const evalPosition = () => {
   let score = gameBoard.material[0] - gameBoard.material[1];
-  let fig = figs.wP.id;
-  for (let figNum = 0; figNum < gameBoard.figNum[fig]; figNum++) {
-    const sq = gameBoard.figList[figIndex(fig, figNum)];
-    const mirrored = mirror(sq);
-    score += pawnTable[mirrored[0]][mirrored[1]];
-  }
-  fig = figs.bP.id;
-  for (let figNum = 0; figNum < gameBoard.figNum[fig]; figNum++) {
-    const sq = gameBoard.figList[figIndex(fig, figNum)];
-    score -= pawnTable[sq[0]][sq[1]];
-  }
-  fig = figs.wN.id;
-  for (let figNum = 0; figNum < gameBoard.figNum[fig]; figNum++) {
-    const sq = gameBoard.figList[figIndex(fig, figNum)];
-    const mirrored = mirror(sq);
-    score += knightTable[mirrored[0]][mirrored[1]];
-  }
-  fig = figs.bN.id;
-  for (let figNum = 0; figNum < gameBoard.figNum[fig]; figNum++) {
-    const sq = gameBoard.figList[figIndex(fig, figNum)];
-    score -= knightTable[sq[0]][sq[1]];
-  }
-  fig = figs.wB.id;
-  for (let figNum = 0; figNum < gameBoard.figNum[fig]; figNum++) {
-    const sq = gameBoard.figList[figIndex(fig, figNum)];
-    const mirrored = mirror(sq);
-    score += bishopTable[mirrored[0]][mirrored[1]];
-  }
-  fig = figs.bB.id;
-  for (let figNum = 0; figNum < gameBoard.figNum[fig]; figNum++) {
-    const sq = gameBoard.figList[figIndex(fig, figNum)];
-    score -= bishopTable[sq[0]][sq[1]];
-  }
-  fig = figs.wR.id;
-  for (let figNum = 0; figNum < gameBoard.figNum[fig]; figNum++) {
-    const sq = gameBoard.figList[figIndex(fig, figNum)];
-    const mirrored = mirror(sq);
-    score += rookTable[mirrored[0]][mirrored[1]];
-  }
-  fig = figs.bR.id;
-  for (let figNum = 0; figNum < gameBoard.figNum[fig]; figNum++) {
-    const sq = gameBoard.figList[figIndex(fig, figNum)];
-    score -= rookTable[sq[0]][sq[1]];
-  }
-  fig = figs.wQ.id;
-  for (let figNum = 0; figNum < gameBoard.figNum[fig]; figNum++) {
-    const sq = gameBoard.figList[figIndex(fig, figNum)];
-    const mirrored = mirror(sq);
-    score += rookTable[mirrored[0]][mirrored[1]];
-  }
-  fig = figs.bQ.id;
-  for (let figNum = 0; figNum < gameBoard.figNum[fig]; figNum++) {
-    const sq = gameBoard.figList[figIndex(fig, figNum)];
-    score -= rookTable[sq[0]][sq[1]];
+  for (const key in figs) {
+    const fig = figs[key];
+    if (typeof fig === 'number' || kings.includes(fig.id)) continue;
+    for (let figNum = 0; figNum < gameBoard.figNum[fig.id]; figNum++) {
+      const sq = gameBoard.figList[figIndex(fig.id, figNum)];
+      if (fig.color === colors.white) {
+        const mirrored = mirror(sq);
+        score += fig.table[mirrored[0]][mirrored[1]];
+      } else {
+        score -= fig.table[sq[0]][sq[1]];
+      }
+    }
   }
   if (gameBoard.figNum[figs.wB.id] >= 2) score += bishopPair;
   if (gameBoard.figNum[figs.bB.id] >= 2) score -= bishopPair;
