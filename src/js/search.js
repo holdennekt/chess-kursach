@@ -10,7 +10,7 @@ search.stop;
 search.best;
 search.thinking;
 
-const pickNextMove = moveNum => {
+const pickNextMove = (moveNum) => {
   let bestScore = -1;
   let bestNum = moveNum;
   const end = gameBoard.moveListStart[gameBoard.ply + 1];
@@ -84,7 +84,7 @@ const quiescence = (alpha, beta) => {
   return alpha;
 };
 
-const searchPvMove = pvMove => {
+const searchPvMove = (pvMove) => {
   const start = gameBoard.moveListStart[gameBoard.ply];
   const end = gameBoard.moveListStart[gameBoard.ply + 1];
   if (!checkObjectsEqual(pvMove, emptyMove())) {

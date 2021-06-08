@@ -8,7 +8,7 @@ const probePvTable = () => {
   return emptyMove();
 };
 
-const getPvNum = depth => {
+const getPvNum = (depth) => {
   let move = probePvTable();
   let count = 0;
   while (!checkObjectsEqual(move, emptyMove()) && count < depth) {
@@ -24,7 +24,7 @@ const getPvNum = depth => {
   return count;
 };
 
-const storePvMove = move => {
+const storePvMove = (move) => {
   const index = gameBoard.posKey % pvEntries;
   gameBoard.pvTable[index].posKey = gameBoard.posKey;
   gameBoard.pvTable[index].move = move;

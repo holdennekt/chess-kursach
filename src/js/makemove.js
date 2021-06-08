@@ -1,47 +1,47 @@
 'use strict';
 
-const clearFig = (sq, obj = gameBoard, board = grid) => {
-  const fig = board[sq[0]][sq[1]];
+const clearFig = (sq) => {
+  const fig = grid[sq[0]][sq[1]];
   const key = getKeyById(figs, fig);
   const col = figs[key].color;
   let tFigNum = -1;
-  board[sq[0]][sq[1]] = figs.empty;
-  obj.material[col] -= figs[key].value;
-  for (let i = 0; i < obj.figNum[fig]; i++) {
+  grid[sq[0]][sq[1]] = figs.empty;
+  gameBoard.material[col] -= figs[key].value;
+  for (let i = 0; i < gameBoard.figNum[fig]; i++) {
     if (
-      obj.figList[figIndex(fig, i)][0] === sq[0] &&
-      obj.figList[figIndex(fig, i)][1] === sq[1]
+      gameBoard.figList[figIndex(fig, i)][0] === sq[0] &&
+      gameBoard.figList[figIndex(fig, i)][1] === sq[1]
     ) {
       tFigNum = i;
       break;
     }
   }
-  obj.figNum[fig]--;
-  obj.figList[figIndex(fig, tFigNum)] =
-    obj.figList[figIndex(fig, obj.figNum[fig])];
+  gameBoard.figNum[fig]--;
+  gameBoard.figList[figIndex(fig, tFigNum)] =
+    gameBoard.figList[figIndex(fig, gameBoard.figNum[fig])];
 };
 
-const addFig = (sq, fig, obj = gameBoard, board = grid) => {
+const addFig = (sq, fig) => {
   const key = getKeyById(figs, fig);
   const col = figs[key].color;
-  board[sq[0]][sq[1]] = fig;
-  obj.material[col] += figs[key].value;
-  obj.figList[figIndex(fig, obj.figNum[fig])] = sq;
-  obj.figNum[fig]++;
+  grid[sq[0]][sq[1]] = fig;
+  gameBoard.material[col] += figs[key].value;
+  gameBoard.figList[figIndex(fig, gameBoard.figNum[fig])] = sq;
+  gameBoard.figNum[fig]++;
 };
 
-const moveFig = (from, to, obj = gameBoard, board = grid) => {
-  const fig = board[from[0]][from[1]];
+const moveFig = (from, to) => {
+  const fig = grid[from[0]][from[1]];
   hashFig(fig, from);
-  board[from[0]][from[1]] = figs.empty;
+  grid[from[0]][from[1]] = figs.empty;
   hashFig(fig, to);
-  board[to[0]][to[1]] = fig;
-  for (let i = 0; i < obj.figNum[fig]; i++) {
+  grid[to[0]][to[1]] = fig;
+  for (let i = 0; i < gameBoard.figNum[fig]; i++) {
     if (
-      obj.figList[figIndex(fig, i)][0] === from[0] &&
-      obj.figList[figIndex(fig, i)][1] === from[1]
+      gameBoard.figList[figIndex(fig, i)][0] === from[0] &&
+      gameBoard.figList[figIndex(fig, i)][1] === from[1]
     ) {
-      obj.figList[figIndex(fig, i)] = to;
+      gameBoard.figList[figIndex(fig, i)] = to;
       break;
     }
   }
@@ -56,8 +56,7 @@ const checkEnPas = (move, mode = 'makeMove') => {
       } else {
         clearFig([to[0] - 1, to[1]]);
       }
-    }
-    else if (mode === 'takeMove') {
+    } else if (mode === 'takeMove') {
       if (gameBoard.side === colors.white) {
         addFig([to[0] + 1, to[1]], figs.bP.id);
       } else {
@@ -67,7 +66,7 @@ const checkEnPas = (move, mode = 'makeMove') => {
   }
 };
 
-const checkPawnStart = move => {
+const checkPawnStart = (move) => {
   const from = move.from;
   const isPawn =
     grid[from[0]][from[1]] === figs.wP.id ||
@@ -85,47 +84,44 @@ const checkPawnStart = move => {
       hashEnPassant();
     }
   }
-}
+};
 
-const updateCastlePerm = (from, to, obj = gameBoard) => {
+const updateCastlePerm = (from, to) => {
   if (arrsEqual(from, [0, 0]) || arrsEqual(to, [0, 0])) {
-    obj.castlePerm.blackQSide = false;
+    gameBoard.castlePerm.blackQSide = false;
   }
   if (arrsEqual(from, [0, 4]) || arrsEqual(to, [0, 4])) {
-    obj.castlePerm.blackQSide = false;
-    obj.castlePerm.blackKSide = false;
+    gameBoard.castlePerm.blackQSide = false;
+    gameBoard.castlePerm.blackKSide = false;
   }
   if (arrsEqual(from, [0, 7]) || arrsEqual(to, [0, 7])) {
-    obj.castlePerm.blackKSide = false;
+    gameBoard.castlePerm.blackKSide = false;
   }
   if (arrsEqual(from, [7, 0]) || arrsEqual(to, [7, 0])) {
-    obj.castlePerm.whiteQSide = false;
+    gameBoard.castlePerm.whiteQSide = false;
   }
   if (arrsEqual(from, [7, 4]) || arrsEqual(to, [7, 4])) {
-    obj.castlePerm.whiteQSide = false;
-    obj.castlePerm.whiteKSide = false;
+    gameBoard.castlePerm.whiteQSide = false;
+    gameBoard.castlePerm.whiteKSide = false;
   }
   if (arrsEqual(from, [7, 7]) || arrsEqual(to, [7, 7])) {
-    obj.castlePerm.whiteKSide = false;
+    gameBoard.castlePerm.whiteKSide = false;
   }
 };
 
-const checkCastling = (castling, dir = 'straight') => {
+const checkCastling = (castling, mode = 'makeMove') => {
   if (castling === 'whiteKSide') {
-    if (dir === 'straight') moveFig([7, 7], [7, 5]);
-    else moveFig([7, 5], [7, 7]);
-  }
-  else if (castling === 'whiteQSide') {
-    if (dir === 'straight') moveFig([7, 0], [7, 3]);
-    else moveFig([7, 3], [7, 0]);
-  }
-  else if (castling === 'blackKSide') {
-    if (dir === 'straight') moveFig([0, 7], [0, 5]);
-    else moveFig([0, 5], [0, 7]);
-  }
-  else if (castling === 'blackQSide') {
-    if (dir === 'straight') moveFig([0, 0], [0, 3]);
-    else moveFig([0, 3], [0, 0]);
+    if (mode === 'makeMove') moveFig([7, 7], [7, 5]);
+    else if (mode === 'takeMove') moveFig([7, 5], [7, 7]);
+  } else if (castling === 'whiteQSide') {
+    if (mode === 'makeMove') moveFig([7, 0], [7, 3]);
+    else if (mode === 'takeMove') moveFig([7, 3], [7, 0]);
+  } else if (castling === 'blackKSide') {
+    if (mode === 'makeMove') moveFig([0, 7], [0, 5]);
+    else if (mode === 'takeMove') moveFig([0, 5], [0, 7]);
+  } else if (castling === 'blackQSide') {
+    if (mode === 'makeMove') moveFig([0, 0], [0, 3]);
+    else if (mode === 'takeMove') moveFig([0, 3], [0, 0]);
   }
 };
 
@@ -148,7 +144,7 @@ const takeMove = () => {
   gameBoard.side ^= 1;
   hashSide();
   checkEnPas(move, 'takeMove');
-  checkCastling(move.flag.castling, 'reverse');
+  checkCastling(move.flag.castling, 'takeMove');
   moveFig(to, from);
   if (move.captured !== figs.empty) addFig(to, move.captured);
   if (move.promoted !== figs.empty) {
@@ -159,7 +155,7 @@ const takeMove = () => {
   }
 };
 
-const updateHistory = move => {
+const updateHistory = (move) => {
   gameBoard.history[gameBoard.hisPly].move = move;
   gameBoard.history[gameBoard.hisPly].fiftyMove = gameBoard.fiftyMove;
   gameBoard.history[gameBoard.hisPly].enPas = cloneObj(gameBoard.enPas);
@@ -168,13 +164,13 @@ const updateHistory = move => {
   );
 };
 
-const makeMove = move => {
+const makeMove = (move) => {
   const side = gameBoard.side;
   const from = move.from;
   const to = move.to;
   gameBoard.history[gameBoard.hisPly].posKey = gameBoard.posKey;
   checkEnPas(move, 'makeMove');
-  checkCastling(move.flag.castling);
+  checkCastling(move.flag.castling, 'makeMove');
   if (!arrsEqual(gameBoard.enPas, noSq())) hashEnPassant();
   hashCastling();
   updateHistory(move);
@@ -203,7 +199,7 @@ const makeMove = move => {
   return true;
 };
 
-const isMoveLegal = move => {
+const isMoveLegal = (move) => {
   const res = makeMove(move);
   if (res) takeMove();
   return res;

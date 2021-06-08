@@ -6,10 +6,10 @@ const userMove = {
   promoted: figs.empty,
 };
 
-const chosen = async block =>
+const chosen = async (block) =>
   new Promise(
-    resolve =>
-      (block.onclick = click => {
+    (resolve) =>
+      (block.onclick = (click) => {
         const clickedOn = click.target.id;
         const parent = document.querySelector('#parent');
         parent.removeChild(document.querySelector('.promotion'));
@@ -113,7 +113,7 @@ const toggleCheckKing = (mode = '', side) => {
   else throw new Error('should be argument either "on" or "off"');
 };
 
-const removeGuiFig = sq => {
+const removeGuiFig = (sq) => {
   const str = `.figure.rank${sq[0]}.file${sq[1]}`;
   const figOnSq = document.querySelectorAll(str)[0];
   document.querySelector('#container').removeChild(figOnSq);
@@ -128,27 +128,24 @@ const addGuiFig = (sq, fig) => {
   document.querySelector('#container').append(img);
 };
 
-const ifCastling = move => {
+const ifCastling = (move) => {
   const castling = move.flag.castling;
   if (castling === 'whiteKSide') {
     removeGuiFig([7, 7]);
     addGuiFig([7, 5], figs.wR.id);
-  }
-  else if (castling === 'whiteQSide') {
+  } else if (castling === 'whiteQSide') {
     removeGuiFig([7, 0]);
     addGuiFig([7, 3], figs.wR.id);
-  }
-  else if (castling === 'blackKSide') {
+  } else if (castling === 'blackKSide') {
     removeGuiFig([0, 7]);
     addGuiFig([0, 5], figs.bR.id);
-  }
-  else if (castling === 'blackQSide') {
+  } else if (castling === 'blackQSide') {
     removeGuiFig([0, 0]);
     addGuiFig([0, 3], figs.bR.id);
   }
 };
 
-const moveGuiFig = move => {
+const moveGuiFig = (move) => {
   if (move.flag.enPas) {
     let epRemove;
     if (gameBoard.side === colors.white) {
@@ -169,7 +166,7 @@ const moveGuiFig = move => {
   }
 };
 
-const suggestMoves = from => {
+const suggestMoves = (from) => {
   generateMoves();
   const start = gameBoard.moveListStart[gameBoard.ply];
   const end = gameBoard.moveListStart[gameBoard.ply + 1];
@@ -231,7 +228,7 @@ const clickedOnFigure = (i, j) => {
   makeUserMove();
 };
 
-const clicked = click => {
+const clicked = (click) => {
   const targetClass = click.target.className;
   const i = parseInt(targetClass[11]);
   const j = parseInt(targetClass[17]);
@@ -255,7 +252,7 @@ const newGame = () => {
   generateMoves();
 };
 
-const gameOver = str => {
+const gameOver = (str) => {
   const block = document.createElement('div');
   const text = document.createElement('p');
   const btn = document.createElement('button');
@@ -360,7 +357,7 @@ const checkAndSet = () => {
 
 const startSearch = () => {
   search.depth = maxDepth;
-  search.time = 800;
+  search.time = 700;
   searchPosition();
   makeMove(search.best);
   moveGuiFig(search.best);

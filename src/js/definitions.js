@@ -172,7 +172,7 @@ const logGrid = () => {
   for (let i = 0; i < 8; i++) {
     let line = i + ' ';
     for (let j = 0; j < 8; j++) {
-      let key = getKeyById(figs, grid[i][j]);
+      const key = getKeyById(figs, grid[i][j]);
       if (key === 'empty') line += '.  ';
       else line += key + ' ';
     }

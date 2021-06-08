@@ -157,7 +157,7 @@ const blackPawns = () => {
   }
 };
 
-const castling = side => {
+const castling = (side) => {
   let i, color;
   if (side === colors.white) (i = 7), (color = 'white');
   else (i = 0), (color = 'black');
@@ -201,7 +201,7 @@ const castling = side => {
   }
 };
 
-const noSlideFigs = col => {
+const noSlideFigs = (col) => {
   for (const i in figs) {
     if (figs[i].slide === false && figs[i].color === col) {
       const fig = figs[i].id;
@@ -226,7 +226,7 @@ const noSlideFigs = col => {
   }
 };
 
-const slideFigs = col => {
+const slideFigs = (col) => {
   for (const i in figs) {
     if (figs[i].slide && figs[i].color === col) {
       const fig = figs[i].id;
@@ -267,7 +267,7 @@ const generateMoves = () => {
   slideFigs(gameBoard.side);
 };
 
-const moveExists = move => {
+const moveExists = (move) => {
   generateMoves();
   const start = gameBoard.moveListStart[gameBoard.ply];
   const end = gameBoard.moveListStart[gameBoard.ply + 1];
