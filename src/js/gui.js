@@ -6,16 +6,16 @@ const userMove = {
   promoted: figs.empty,
 };
 
-const chosen = async (block) =>
-  new Promise(
-    (resolve) =>
-      (block.onclick = (click) => {
-        const clickedOn = click.target.id;
-        const parent = document.querySelector('#parent');
-        parent.removeChild(document.querySelector('.promotion'));
-        resolve(figs[clickedOn].id);
-      })
-  );
+const chosen = async (block) => {
+  return new Promise((resolve) => {
+    block.onclick = (click) => {
+      const clickedOn = click.target.id;
+      const parent = document.querySelector('#parent');
+      parent.removeChild(document.querySelector('.promotion'));
+      resolve(figs[clickedOn].id);
+    };
+  });
+};
 
 const suggestPromotion = async () => {
   const blockPromotion = document.createElement('div');
