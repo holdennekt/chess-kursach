@@ -45,8 +45,8 @@ const parseMove = async (from, to) => {
   generateMoves();
   const start = gameBoard.moveListStart[gameBoard.ply];
   const end = gameBoard.moveListStart[gameBoard.ply + 1];
-  let found = false,
-    move;
+  let found = false;
+  let move;
   for (let index = start; index < end; index++) {
     move = gameBoard.moveList[index];
     if (arrsEqual(move.from, from) && arrsEqual(move.to, to)) {
@@ -270,24 +270,22 @@ const gameOver = (str) => {
 };
 
 const isEnoughFigures = () => {
-  if (
-    gameBoard.figNum[figs.wP.id] !== 0 ||
-    gameBoard.figNum[figs.bP.id] !== 0 ||
-    gameBoard.figNum[figs.wQ.id] !== 0 ||
-    gameBoard.figNum[figs.bQ.id] !== 0 ||
-    gameBoard.figNum[figs.wR.id] !== 0 ||
-    gameBoard.figNum[figs.bR.id] !== 0 ||
-    gameBoard.figNum[figs.wB.id] > 1 ||
-    gameBoard.figNum[figs.bB.id] > 1 ||
-    gameBoard.figNum[figs.wN.id] > 1 ||
-    gameBoard.figNum[figs.bN.id] > 1 ||
-    (gameBoard.figNum[figs.wN.id] !== 0 &&
-      gameBoard.figNum[figs.wB.id] !== 0) ||
-    (gameBoard.figNum[figs.bN.id] !== 0 && gameBoard.figNum[figs.bB.id] !== 0)
-  ) {
-    return false;
+  let res = false;
+  const arrMoreZero = [figs.wP, figs.bP, figs.wQ, figs.bQ, figs.wR, figs.bR];
+  const arrMoreOne = [figs.wB, figs.bB, figs.wN, figs.bN];
+  for (const fig of arrMoreZero) {
+    if (gameBoard.figNum[fig.id] > 0) res = true;
   }
-  return true;
+  for (const fig of arrMoreOne) {
+    if (gameBoard.figNum[fig.id] > 1) res = true;
+  }
+  const wKnightNum = gameBoard.figNum[figs.wN.id];
+  const bKnightNum = gameBoard.figNum[figs.bN.id];
+  const wBishopNum = gameBoard.figNum[figs.wB.id];
+  const bBishopNum = gameBoard.figNum[figs.bB.id];
+  if (wKnightNum > 0 && wBishopNum > 0) res = true;
+  if (bKnightNum > 0 && bBishopNum > 0) res = true;
+  return res;
 };
 
 const threeFoldRep = () => {
@@ -304,7 +302,7 @@ const isDraw = () => {
     str = 'Draw, fifty move rule';
   } else if (threeFoldRep() >= 2) {
     str = 'Draw, 3-fold repetition';
-  } else if (isEnoughFigures()) {
+  } else if (!isEnoughFigures()) {
     str = 'Draw, not enough figures to mate';
   }
   return str;
